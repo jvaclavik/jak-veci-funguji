@@ -21,12 +21,19 @@
   <style>
     .jpg-stage { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); align-items: start; }
     @media (min-width: 60rem) { .jpg-stage { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 2rem; } }
-    #pic { display: block; width: 100%; max-width: 512px; aspect-ratio: 1; margin: 0 auto; border: 1px solid var(--rule); background: #fff; image-rendering: pixelated; cursor: crosshair; touch-action: manipulation; }
+    #pic { display: block; width: 100%; max-width: 512px; aspect-ratio: 1; margin: 0 auto; border: 1px solid var(--rule); background: #fff; image-rendering: pixelated; cursor: crosshair; touch-action: pan-y; }
     .tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
     .tile { display: grid; gap: 0.3rem; margin: 0; }
     .tile canvas { display: block; width: 100%; aspect-ratio: 1; border: 1px solid var(--rule); background: #fff; image-rendering: pixelated; }
     .tile .label { line-height: 1.3; }
     .panel { display: grid; gap: 0.8rem; min-width: 0; }
+    .tile-key { margin: 0; font-size: 0.88rem; line-height: 1.45; color: var(--ink-2); }
+    .dct-stage { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1rem 0.8rem; max-width: 46rem; margin: 0 auto; }
+    .dct-stage .tile { grid-column: span 2; }
+    .dct-stage .tile.wide { grid-column: span 3; }
+    .dct-stage .tile.src { grid-column: 2 / span 4; }
+    @media (min-width: 46rem) { .dct-stage .tile.wide, .dct-stage .tile.src { grid-column: span 2; } }
+    .tile canvas.pick { cursor: crosshair; touch-action: pan-y; }
     .file { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
     label.btn { display: inline-flex; align-items: center; cursor: pointer; }
     .file:focus-visible + label.btn { outline: 3px solid var(--cat); outline-offset: 2px; }
@@ -59,7 +66,7 @@
     <figure class="fig" id="obr1">
       <div class="fig-head">
         <p class="fig-num"><b>Obr. 1</b> Obrázek zkomprimovaný ve vašem prohlížeči</p>
-        <span class="label">Stahujte kvalitu a klepněte do obrázku na čtvereček, který chcete prozkoumat</span>
+        <span class="label">Stahujte kvalitu. Klepnutím nebo tažením po obrázku vyberete čtvereček k prozkoumání</span>
       </div>
       <div class="fig-stage jpg-stage">
         <canvas id="pic" width="256" height="256" role="img" aria-label="Obrázek krajiny s domem po kompresi"></canvas>
@@ -71,6 +78,7 @@
             <figure class="tile"><canvas id="t-quant" width="8" height="8"></canvas><span class="label">3 · po zaokrouhlení</span></figure>
             <figure class="tile"><canvas id="t-out" width="8" height="8"></canvas><span class="label">4 · co z toho vyjde</span></figure>
           </div>
+          <p class="tile-key">Ve dlaždicích 2 a 3 patří každé políčko jednomu vzoru. Bílé znamená, že vzor ve čtverečku není, čím modřejší, tím víc ho tam je. Jak vzory vypadají, ukazuje <a href="#obr2">obrázek 2</a>.</p>
         </div>
       </div>
       <div class="fig-controls">
@@ -109,7 +117,7 @@
           <li><span class="n">Nenulových čísel ve čtverečku</span><span class="v" id="st-nz"></span></li>
         </ul>
       </div>
-      <figcaption class="fig-caption">Obrázek má 256 × 256 bodů a je schválně zvětšený, aby byly vidět jednotlivé body. Komprese probíhá doopravdy, stejným postupem jako ve formátu JPEG. Velikost souboru je odhad, skutečný kodér by vyšel o něco jinak. Ve druhé dlaždici je vlevo nahoře celkový jas čtverečku, doprava a dolů jsou čím dál jemnější vzory. Vlastní fotka se zpracuje jen ve vašem prohlížeči a nikam se neposílá.</figcaption>
+      <figcaption class="fig-caption">Obrázek má 256 × 256 bodů a je schválně zvětšený, aby byly vidět jednotlivé body. Komprese probíhá doopravdy, stejným postupem jako ve formátu JPEG. Velikost souboru je odhad, skutečný kodér by vyšel o něco jinak. Dlaždice ukazují jen jas vybraného čtverečku. Ve druhé a třetí je vlevo nahoře jeho průměrný jas, doprava a dolů jsou čím dál jemnější vzory. Vlastní fotka se zpracuje jen ve vašem prohlížeči a nikam se neposílá.</figcaption>
     </figure>
 
     <section class="sec" aria-labelledby="h-proc">
@@ -147,13 +155,52 @@
         <h2 id="h-vzory">Druhý trik: čtverečky a vzory</h2>
         <p>Obrázek se rozdělí na čtverečky osm krát osm bodů. Každý má šedesát čtyři hodnot jasu. JPEG je neukládá přímo. Popíše čtvereček jinak: jako směs šedesáti čtyř pevně daných vzorů.</p>
         <p>První vzor je rovnoměrná plocha. Další jsou plynulé přechody zleva doprava a shora dolů, pak čím dál hustší pruhy a nakonec jemná šachovnice, kde se světlá a tmavá střídá bod od bodu. Jakýkoli čtvereček se dá přesně složit, když se vezme správné množství každého vzoru.</p>
+        <p>Ke každému vzoru pak patří jedno číslo: kolik ho ve čtverečku je. Velké číslo znamená, že je vzor ve čtverečku výrazný. Nula znamená, že v něm není vůbec. Záporné číslo říká, že se vzor bere obráceně, se světlými a tmavými místy prohozenými.</p>
         <p>Počet čísel se tím nezměnil, pořád jich je šedesát čtyři. Změnilo se, co znamenají. <span class="hl">U běžné fotky vyjde velké číslo jen u několika hrubých vzorů a u jemných skoro nula.</span> Kus oblohy je skoro celý první vzor. Kus trávy potřebuje i ty jemnější.</p>
       </div>
       <aside class="note" aria-label="Poznámka na okraj">
         <span class="label">Zkuste</span>
-        <p>Klepněte doprostřed oblohy a podívejte se na druhou dlaždici. Svítí v ní jen pár políček vlevo nahoře. Pak klepněte na trávu nebo na okno domu: políček svítí mnohem víc.</p>
+        <p>V obrázku 2 klepněte v malém obrázku nahoru do oblohy a stáhněte posuvník na jedničku. Čtvereček je hotový jediným vzorem. Pak vyberte okno domu a pusťte skládání: kříž okna se začne rýsovat až kolem čtyřicátého vzoru.</p>
       </aside>
     </section>
+
+    <figure class="fig" id="obr2">
+      <div class="fig-head">
+        <p class="fig-num"><b>Obr. 2</b> Čtvereček složený ze vzorů</p>
+        <span class="label">Přidávejte vzory posuvníkem. Klepnutím na vzor zjistíte, kolik ho ve čtverečku je</span>
+      </div>
+      <div class="fig-stage">
+        <div class="dct-stage">
+          <figure class="tile src"><canvas id="mini" class="pick" width="256" height="256" role="img" aria-label="Původní obrázek s vyznačeným čtverečkem"></canvas><span class="label">Odkud čtvereček je</span></figure>
+          <figure class="tile wide"><canvas id="g-pat" class="pick" width="73" height="73" role="img" aria-label="Všech 64 vzorů od hrubých vlevo nahoře po jemné vpravo dole"></canvas><span class="label">Všech 64 vzorů</span></figure>
+          <figure class="tile wide"><canvas id="g-amt" class="pick" width="73" height="73" role="img" aria-label="Kolik je kterého vzoru ve vybraném čtverečku"></canvas><span class="label">Kolik je kterého</span></figure>
+          <figure class="tile"><canvas id="t2-orig" width="8" height="8"></canvas><span class="label">Původní čtvereček</span></figure>
+          <figure class="tile"><canvas id="t2-sum" width="8" height="8"></canvas><span class="label" id="t2-sum-label">Složeno ze vzorů</span></figure>
+          <figure class="tile"><canvas id="t2-pat" width="8" height="8"></canvas><span class="label">Vybraný vzor</span></figure>
+        </div>
+      </div>
+      <div class="fig-controls">
+        <div class="ctl ctl-grow">
+          <label class="label" for="k">Kolik vzorů použít</label>
+          <div class="ctl-row">
+            <input type="range" id="k" min="1" max="64" step="1" value="6">
+            <output class="val" id="k-val" for="k"></output>
+          </div>
+        </div>
+        <div class="ctl">
+          <button type="button" class="btn" id="play">Skládat postupně</button>
+        </div>
+      </div>
+      <div class="fig-status split">
+        <p class="status" id="status2" aria-live="polite"></p>
+        <ul class="stats" aria-label="Stav modelu">
+          <li><span class="n">Použito vzorů</span><span class="v" id="st2-k"></span></li>
+          <li><span class="n">Odchylka od původního</span><span class="v" id="st2-err"></span></li>
+          <li><span class="n">Vybraného vzoru je</span><span class="v" id="st2-amt"></span></li>
+        </ul>
+      </div>
+      <figcaption class="fig-caption">Čtvereček je ten, který máte vybraný v obrázku 1, a jde vybrat i tady v malém obrázku. Pracuje se jen s jasem. Vzory se přidávají od hrubých k jemným, po úhlopříčkách od levého horního rohu. V mřížce vpravo je políčko tím modřejší, čím víc daného vzoru ve čtverečku je; šedá políčka se zatím nepoužila. Je to stejná mřížka jako ve druhé dlaždici obrázku 1.</figcaption>
+    </figure>
 
     <section class="sec" aria-labelledby="h-zaokrouhleni">
       <div class="prose">
@@ -262,7 +309,17 @@
       for (let v = 0; v < 8; v++) for (let x = 0; x < 8; x++) { let a = 0; for (let u = 0; u < 8; u++) a += C[u][x] * F[v * 8 + u]; tmp[v * 8 + x] = a; }
       for (let x = 0; x < 8; x++) for (let y = 0; y < 8; y++) { let a = 0; for (let v = 0; v < 8; v++) a += C[v][y] * tmp[v * 8 + x]; out[y * 8 + x] = a; }
     }
-    const s = { q: 60, chroma: 2, view: "out", block: [13, 13], rgb: null, planes: null, result: null };
+    // pořadí vzorů od hrubých k jemným: po úhlopříčkách od levého horního rohu
+    const ZZ = [];
+    for (let d = 0; d < 15; d++) for (let i = 0; i <= d; i++) { const u = d % 2 ? d - i : i, v = d - u; if (u < 8 && v < 8) ZZ.push(v * 8 + u); }
+    const RANK = new Array(64);
+    ZZ.forEach((idx, n) => { RANK[idx] = n; });
+    // jak každý vzor vypadá: jas jeho 64 bodů roztažený na celý rozsah
+    const PAT = Array.from({ length: 64 }, (_, i) => {
+      const vals = Array.from({ length: 64 }, (_, p) => C[i & 7][p & 7] * C[i >> 3][p >> 3]), top = Math.max(...vals.map(Math.abs));
+      return vals.map((x) => Math.round(128 + (110 * x) / top));
+    });
+    const s = { q: 60, chroma: 2, view: "out", block: [14, 13], rgb: null, planes: null, result: null, k: 6, pat: 1, timer: null };
     const blk = new Float32Array(64), cf = new Float32Array(64);
 
     // rozloží obrázek na jas a dvě barevné složky a každou převede na vzory
@@ -324,6 +381,13 @@
       for (let i = 0; i < 64; i++) { const [r, g, b] = cell(i); d.data[i * 4] = r; d.data[i * 4 + 1] = g; d.data[i * 4 + 2] = b; d.data[i * 4 + 3] = 255; }
       c.putImageData(d, 0, 0);
     }
+    const gray = (v) => { const g = Math.max(0, Math.min(255, v)); return [g, g, g]; };
+    // síla vzoru jako barva: nula bílá, velké číslo tmavě modrá
+    const strength = (v) => { if (!v) return [255, 255, 255]; const k = Math.min(1, Math.log2(1 + Math.abs(v)) / 9); return [Math.round(255 - k * 219), Math.round(255 - k * 189), Math.round(255 - k * 61)]; };
+    function frame(c, bx, by) {
+      c.strokeStyle = "#ffffff"; c.lineWidth = 2; c.strokeRect(bx * 8 - 1, by * 8 - 1, 10, 10);
+      c.strokeStyle = "#e0245e"; c.lineWidth = 1; c.strokeRect(bx * 8 - 0.5, by * 8 - 0.5, 9, 9);
+    }
     function render() {
       const r = s.result, show = new Uint8ClampedArray(N * N * 4);
       if (s.view === "out") show.set(r.img);
@@ -331,13 +395,10 @@
       else for (let i = 0; i < N * N * 4; i += 4) { const e = Math.min(255, 6 * (Math.abs(r.img[i] - s.rgb[i]) + Math.abs(r.img[i + 1] - s.rgb[i + 1]) + Math.abs(r.img[i + 2] - s.rgb[i + 2])) / 3); show[i] = show[i + 1] = show[i + 2] = e; show[i + 3] = 255; }
       ctx.putImageData(new ImageData(show, N, N), 0, 0);
       const [bx, by] = s.block;
-      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2; ctx.strokeRect(bx * 8 - 1, by * 8 - 1, 10, 10);
-      ctx.strokeStyle = "#e0245e"; ctx.lineWidth = 1; ctx.strokeRect(bx * 8 - 0.5, by * 8 - 0.5, 9, 9);
+      frame(ctx, bx, by);
 
       // čtyři pohledy na vybraný čtvereček jasu
       const P = s.planes[0], at = (i) => (by * 8 + (i >> 3)) * N + bx * 8 + (i & 7);
-      const gray = (v) => { const g = Math.max(0, Math.min(255, v)); return [g, g, g]; };
-      const strength = (v) => { if (!v) return [255, 255, 255]; const k = Math.min(1, Math.log2(1 + Math.abs(v)) / 9); return [Math.round(255 - k * 219), Math.round(255 - k * 189), Math.round(255 - k * 61)]; };
       let nz = 0;
       const qv = (i) => Math.round(P.coef[at(i)] / r.tableY[i]) * r.tableY[i];
       for (let i = 0; i < 64; i++) if (qv(i)) nz++;
@@ -357,7 +418,70 @@
       else status = "<strong>Čtverečky.</strong> Z každého čtverečku zbyl jen průměrný jas a jeden dva hrubé přechody. Sousední čtverečky na sebe nenavazují a je vidět mřížka.";
       if (s.view === "diff") status += " Na obrázku je teď to, co komprese zahodila, šestkrát zesílené: čím světlejší místo, tím větší chyba.";
       $("status").innerHTML = status;
+      render2();
     }
+
+    /* ---------- obrázek 2: čtvereček složený ze vzorů ---------- */
+    // mřížka 8 × 8 políček po 8 bodech, mezi nimi a kolem nich bod mezery
+    const GAP = "#c9cdd3", cellX = (i) => 1 + (i & 7) * 9, cellY = (i) => 1 + (i >> 3) * 9;
+    const mini = $("mini").getContext("2d"), gPat = $("g-pat").getContext("2d"), gAmt = $("g-amt").getContext("2d");
+    const sheet = document.createElement("canvas");
+    sheet.width = sheet.height = 73;
+    {
+      const c = sheet.getContext("2d"), d = c.createImageData(73, 73);
+      for (let i = 0; i < 73 * 73; i++) { d.data[i * 4] = 201; d.data[i * 4 + 1] = 205; d.data[i * 4 + 2] = 211; d.data[i * 4 + 3] = 255; }
+      for (let i = 0; i < 64; i++) for (let p = 0; p < 64; p++) { const o = ((cellY(i) + (p >> 3)) * 73 + cellX(i) + (p & 7)) * 4; d.data[o] = d.data[o + 1] = d.data[o + 2] = PAT[i][p]; }
+      c.putImageData(d, 0, 0);
+    }
+    const sum = new Float32Array(64), rec = new Float32Array(64);
+    let said2 = "";
+    function render2() {
+      const [bx, by] = s.block, P = s.planes[0], at = (i) => (by * 8 + (i >> 3)) * N + bx * 8 + (i & 7);
+      mini.putImageData(new ImageData(new Uint8ClampedArray(s.rgb), N, N), 0, 0);
+      frame(mini, bx, by);
+
+      // složení z prvních k vzorů a jak daleko má k původnímu čtverečku
+      for (let i = 0; i < 64; i++) sum[i] = RANK[i] < s.k ? P.coef[at(i)] : 0;
+      fromPatterns(sum, rec);
+      let err = 0;
+      for (let i = 0; i < 64; i++) err += Math.abs(Math.max(0, Math.min(255, rec[i] + 128)) - P.data[at(i)]);
+      err = (err / 64 / 255) * 100;
+
+      gPat.drawImage(sheet, 0, 0);
+      gAmt.fillStyle = GAP; gAmt.fillRect(0, 0, 73, 73);
+      for (let i = 0; i < 64; i++) {
+        const used = RANK[i] < s.k, [r, g, b] = strength(Math.round(P.coef[at(i)]));
+        if (!used) { gPat.fillStyle = "rgba(201, 205, 211, 0.8)"; gPat.fillRect(cellX(i), cellY(i), 8, 8); }
+        gAmt.fillStyle = used ? `rgb(${r}, ${g}, ${b})` : "#dfe2e6";
+        gAmt.fillRect(cellX(i), cellY(i), 8, 8);
+      }
+      [gPat, gAmt].forEach((c) => { c.strokeStyle = "#e0245e"; c.lineWidth = 1; c.strokeRect(cellX(s.pat) - 0.5, cellY(s.pat) - 0.5, 9, 9); });
+
+      tile("t2-orig", (i) => gray(P.data[at(i)]));
+      tile("t2-sum", (i) => gray(rec[i] + 128));
+      tile("t2-pat", (i) => gray(PAT[s.pat][i]));
+
+      const amount = Math.round(P.coef[at(s.pat)]), shown = String(amount).replace("-", "−");
+      $("k").value = s.k;
+      $("k-val").textContent = `${s.k} z 64`;
+      $("t2-sum-label").textContent = s.k === 1 ? "Složeno z 1 vzoru" : `Složeno z ${s.k} vzorů`;
+      $("st2-k").textContent = `${s.k} z 64`;
+      $("st2-err").textContent = `${fmt1.format(err)} %`;
+      $("st2-amt").textContent = shown;
+      $("play").textContent = s.timer ? "Zastavit" : "Skládat postupně";
+      let status;
+      if (s.k === 64) status = "<strong>Všech 64 vzorů.</strong> Čtvereček vyšel přesně jako původní, nic se neztratilo.";
+      else if (s.k === 1 && err < 1.5) status = "<strong>Stačí jeden vzor.</strong> Čtvereček je skoro jednobarevný, takže ho celý popíše průměrný jas.";
+      else if (s.k === 1) status = "<strong>Jen první vzor.</strong> Celý čtvereček má jednu barvu, svůj průměrný jas.";
+      else if (err < 1.5) status = "<strong>Skoro hotovo.</strong> Rozdíl proti původnímu čtverečku už okem těžko najdete. Zbylé vzory by šly vynechat.";
+      else status = "<strong>Hrubý obrys.</strong> Rozložení světla a stínu už sedí, jemné detaily ještě chybí.";
+      status += ` Vybraný vzor je ${RANK[s.pat] + 1}. v pořadí`;
+      if (amount > 0) status += ` a ve čtverečku je ho ${shown}.`;
+      else if (amount < 0) status += ` a ve čtverečku je ho ${shown}. Záporné číslo znamená, že se bere obráceně.`;
+      else status += " a ve čtverečku není vůbec.";
+      if (status !== said2) { said2 = status; $("status2").innerHTML = status; }
+    }
+    function stop() { clearInterval(s.timer); s.timer = null; }
     function rebuild() { analyse(); compress(); render(); }
 
     /* ---------- ovládání ---------- */
@@ -372,18 +496,39 @@
     }
     bindSeg("chroma-seg", (v) => { s.chroma = Number(v); rebuild(); });
     bindSeg("view-seg", (v) => { s.view = v; render(); });
-    pic.addEventListener("pointerdown", (e) => {
-      const r = pic.getBoundingClientRect();
-      s.block = [Math.max(0, Math.min(31, Math.floor(((e.clientX - r.left) / r.width) * 32))), Math.max(0, Math.min(31, Math.floor(((e.clientY - r.top) / r.height) * 32)))];
+    const clamp = (v, hi) => Math.max(0, Math.min(hi, v));
+    const ARROWS = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+    // Výběr klepnutím, tažením i šipkami. Dokud je tlačítko nebo prst dole, výběr jde za ukazatelem.
+    // pick dostane polohu v plátně jako zlomek šířky a výšky, step posun o jedno políčko.
+    function picker(el, pick, step) {
+      let down = false;
+      const at = (e) => { const r = el.getBoundingClientRect(); pick((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height); };
+      el.addEventListener("pointerdown", (e) => { down = true; try { el.setPointerCapture(e.pointerId); } catch { /* starší prohlížeč: tažení skončí na okraji */ } at(e); });
+      el.addEventListener("pointermove", (e) => { if (down) at(e); });
+      ["pointerup", "pointercancel", "lostpointercapture"].forEach((n) => el.addEventListener(n, () => { down = false; }));
+      el.tabIndex = 0;
+      el.addEventListener("keydown", (e) => { const mv = ARROWS[e.key]; if (!mv) return; e.preventDefault(); step(mv[0], mv[1]); });
+    }
+    function setBlock(bx, by) {
+      bx = clamp(bx, 31); by = clamp(by, 31);
+      if (bx === s.block[0] && by === s.block[1]) return;
+      s.block = [bx, by];
       render();
-    });
-    pic.tabIndex = 0;
-    pic.addEventListener("keydown", (e) => {
-      const mv = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
-      if (!mv) return;
-      e.preventDefault();
-      s.block = [Math.max(0, Math.min(31, s.block[0] + mv[0])), Math.max(0, Math.min(31, s.block[1] + mv[1]))];
-      render();
+    }
+    function setPat(u, v) {
+      const i = clamp(v, 7) * 8 + clamp(u, 7);
+      if (i === s.pat) return;
+      s.pat = i;
+      render2();
+    }
+    [pic, $("mini")].forEach((el) => picker(el, (fx, fy) => setBlock(Math.floor(fx * 32), Math.floor(fy * 32)), (dx, dy) => setBlock(s.block[0] + dx, s.block[1] + dy)));
+    [$("g-pat"), $("g-amt")].forEach((el) => picker(el, (fx, fy) => setPat(Math.floor((fx * 73 - 0.5) / 9), Math.floor((fy * 73 - 0.5) / 9)), (dx, dy) => setPat((s.pat & 7) + dx, (s.pat >> 3) + dy)));
+    $("k").addEventListener("input", (e) => { stop(); s.k = Number(e.target.value); render2(); });
+    $("play").addEventListener("click", () => {
+      if (s.timer) { stop(); render2(); return; }
+      if (s.k >= 64) s.k = 1;
+      s.timer = setInterval(() => { s.k += 1; if (s.k >= 64) stop(); render2(); }, 160);
+      render2();
     });
     function load(draw) {
       const off = document.createElement("canvas");
