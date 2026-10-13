@@ -99,7 +99,7 @@
       $("list").replaceChildren(...shown.map((it) => {
         const box = node("article", `item ${it.rating || ""}`), head = node("div", "head");
         const link = node("a", "", it.article);
-        link.href = it.article === "rozcestnik" ? SITE : `${SITE}${encodeURIComponent(it.article)}/`;
+        link.href = it.article === "rozcestnik" ? SITE : `${SITE}clanky/${encodeURIComponent(it.article)}/`;
         link.target = "_blank"; link.rel = "noopener";
         const del = node("button", "link", "Smazat");
         del.type = "button";
