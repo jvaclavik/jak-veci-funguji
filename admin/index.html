@@ -76,6 +76,8 @@
     const RATING = { ano: "srozumitelné", zcasti: "zčásti", ne: "nesrozumitelné" };
     const when = new Intl.DateTimeFormat("cs-CZ", { dateStyle: "medium", timeStyle: "short" });
     let pass = sessionStorage.getItem("jvf-admin") || "", items = [];
+    // Příznak pro ostatní stránky webu, aby správci ukázaly odkaz sem. Heslo v něm není.
+    const mark = (on) => { try { on ? localStorage.setItem("jvf-admin-on", "1") : localStorage.removeItem("jvf-admin-on"); } catch { /* bez úložiště se odkaz jen neukáže */ } };
 
     async function call(method, query = "") {
       // hlavička unese jen základní znaky, heslo s háčky a čárkami se proto posílá zakódované
@@ -87,7 +89,7 @@
     function fail(err) {
       $("error").textContent = err.message;
       $("error").hidden = false;
-      if (err.status === 401) { sessionStorage.removeItem("jvf-admin"); pass = ""; $("app").hidden = true; $("login").hidden = false; }
+      if (err.status === 401) { sessionStorage.removeItem("jvf-admin"); mark(false); pass = ""; $("app").hidden = true; $("login").hidden = false; }
     }
     // text od čtenářů vkládáme jen jako text, nikdy jako HTML
     function node(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
@@ -129,6 +131,7 @@
         $("f-article").replaceChildren(new Option("Všechny články", ""), ...articles.map((a) => new Option(`${a} (${items.filter((it) => it.article === a).length})`, a)));
         if (articles.includes(keep)) $("f-article").value = keep;
         $("login").hidden = true; $("app").hidden = false;
+        mark(true);
         render();
       } catch (err) { fail(err); }
     }
@@ -137,7 +140,7 @@
     $("f-article").addEventListener("change", render);
     $("f-rating").addEventListener("change", render);
     $("reload").addEventListener("click", load);
-    $("logout").addEventListener("click", () => { sessionStorage.removeItem("jvf-admin"); pass = ""; items = []; $("app").hidden = true; $("login").hidden = false; });
+    $("logout").addEventListener("click", () => { sessionStorage.removeItem("jvf-admin"); mark(false); pass = ""; items = []; $("app").hidden = true; $("login").hidden = false; });
     $("export").addEventListener("click", () => {
       const url = URL.createObjectURL(new Blob([JSON.stringify(items, null, 2)], { type: "application/json" }));
       const a = Object.assign(document.createElement("a"), { href: url, download: `zpetna-vazba-${new Date().toISOString().slice(0, 10)}.json` });

@@ -28,8 +28,22 @@
     .fb .fb-note.bad { color: var(--bad); }
     .fb .fb-done { margin: 0; font-size: 1.05rem; }
     .hub-sec > .fb { margin-top: 0; }
+    .admin-bar { border-bottom: 1px solid var(--rule); }
+    .admin-bar .wrap { display: flex; justify-content: flex-end; padding-block: 0.3rem; }
+    .admin-bar a { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-3); }
+    .admin-bar a:hover { color: var(--ink); }
   `;
   document.head.appendChild(style);
+
+  // Správci, který se v tomhle prohlížeči přihlásil do administrace, ukážeme nahoře odkaz zpět do ní.
+  let admin = false;
+  try { admin = localStorage.getItem("jvf-admin-on") === "1"; } catch { /* bez úložiště odkaz není */ }
+  if (admin) {
+    const bar = document.createElement("div");
+    bar.className = "admin-bar";
+    bar.innerHTML = `<div class="wrap"><a href="/admin/">Administrace</a></div>`;
+    document.body.prepend(bar);
+  }
 
   const shownAt = Date.now();
   // Pošle odpověď a formulář nahradí poděkováním; při chybě ji vypíše pod tlačítko.
