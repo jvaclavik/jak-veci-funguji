@@ -8,7 +8,8 @@
 - `domacnost/`, `technika/`, `doprava/`, `priroda/`, `lidske-telo/` a `vesmir/` jsou kategorie. `index.html` v každé z nich je stránka kategorie se seznamem článků.
 - `<kategorie>/<název>/index.html` jsou články. Každý je samostatná stránka s vlastním stylem a skriptem.
 - `style.css` a `feedback.js` jsou společné pro rozcestník i články.
-- `api/` jsou funkce pro zpětnou vazbu, `admin/` její administrace.
+- `feedback.js` vkládá dva formuláře: zpětnou vazbu pod článek a pod rozcestník, a nápad na nový článek tam, kde stránka má `<div data-form="napady"></div>` (rozcestník a stránky kategorií).
+- `api/` jsou funkce, které odpovědi z formulářů ukládají, `admin/` je jejich administrace.
 - `scripts/` je server pro lokální zkoušení.
 
 Nový článek potřebuje kartu na rozcestníku a na stránce své kategorie a odkaz v seznamu témat na rozcestníku.

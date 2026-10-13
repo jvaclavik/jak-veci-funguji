@@ -10,7 +10,7 @@ let recent = [];
 
 const clean = (v) => (typeof v === "string" ? v.replace(/\r\n/g, "\n").replace(/[\u0000-\u0008\u000b-\u001f]/g, "").trim().slice(0, MAX_TEXT) : "");
 
-// POST /api/feedback: uloží jednu odpověď čtenáře jako soubor.
+// POST /api/feedback: uloží jednu odpověď čtenáře (zpětnou vazbu nebo nápad na článek) jako soubor.
 export default async function handler(req, res) {
   const headers = cors(req);
   if (!headers) return send(res, 403, { error: "Odsud se odpovědi posílat nedají." });
@@ -25,9 +25,9 @@ export default async function handler(req, res) {
   // adresa stránky, ze které odpověď přišla, aby na ni administrace uměla odkázat
   const page = typeof body.page === "string" && body.page.length <= 100 && /^\/([a-z0-9-]+\/)*$/.test(body.page) ? body.page : "";
   const rating = RATINGS.includes(body.rating) ? body.rating : "";
-  const liked = clean(body.liked), missing = clean(body.missing);
+  const liked = clean(body.liked), missing = clean(body.missing), idea = clean(body.idea).slice(0, 1000);
   if (!article) return send(res, 400, { error: "Chybí název článku." }, headers);
-  if (!rating && !liked && !missing) return send(res, 400, { error: "Zpráva je prázdná." }, headers);
+  if (!rating && !liked && !missing && !idea) return send(res, 400, { error: "Zpráva je prázdná." }, headers);
 
   // Roboti vyplní i pole, které člověk nevidí, a odešlou formulář hned. Takové zprávy potichu zahodíme.
   const robot = Boolean(body.website) || !(Number(body.elapsed) >= 2500);
@@ -41,7 +41,7 @@ export default async function handler(req, res) {
   const at = new Date(now), stamp = at.toISOString().replace(/[-:.]/g, "").slice(0, 15).toLowerCase();
   const path = `feedback/${at.toISOString().slice(0, 7)}/${stamp}-${article}-${randomBytes(4).toString("hex")}.json`;
   try {
-    await save(path, { at: at.toISOString(), article, page, rating, liked, missing });
+    await save(path, { at: at.toISOString(), article, page, rating, liked, missing, idea });
   } catch (err) {
     console.error("Uložení odpovědi selhalo:", err);
     return send(res, 500, { error: "Zprávu se nepodařilo uložit." }, headers);

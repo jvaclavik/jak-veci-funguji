@@ -1,5 +1,6 @@
-/* Formulář zpětné vazby pod každým článkem. Odpověď pošle funkci na stejné adrese,
-   která ji uloží jako soubor. Neposílá se nic kromě toho, co čtenář vyplní, a názvu článku. */
+/* Dva formuláře pro čtenáře: zpětná vazba pod článkem a nápad na nový článek pod seznamem článků.
+   Odpověď pošle funkci na stejné adrese, která ji uloží jako soubor.
+   Neposílá se nic kromě toho, co čtenář vyplní, a názvu a adresy stránky. */
 (() => {
   const endpoint = "/api/feedback";
   if (location.pathname.includes("/admin/")) return;
@@ -26,9 +27,73 @@
     .fb .fb-note { margin: 0; font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-3); }
     .fb .fb-note.bad { color: var(--bad); }
     .fb .fb-done { margin: 0; font-size: 1.05rem; }
+    .hub-sec > .fb { margin-top: 0; }
   `;
   document.head.appendChild(style);
 
+  const shownAt = Date.now();
+  // Pošle odpověď a formulář nahradí poděkováním; při chybě ji vypíše pod tlačítko.
+  async function submit(form, note, fields, thanks) {
+    const button = form.querySelector("button[type=submit]");
+    button.disabled = true;
+    note.classList.remove("bad");
+    note.textContent = "Odesílám…";
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ article, page: location.pathname, ...fields, website: form.website.value, elapsed: Date.now() - shownAt }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "");
+      const done = document.createElement("p");
+      done.className = "fb-done";
+      done.setAttribute("role", "status");
+      done.textContent = thanks;
+      form.replaceWith(done);
+    } catch (err) {
+      button.disabled = false;
+      note.classList.add("bad");
+      note.textContent = err.message || "Nepodařilo se to odeslat. Zkuste to prosím za chvíli.";
+    }
+  }
+  const complain = (note, text) => { note.classList.add("bad"); note.textContent = text; };
+
+  // Nápad na nový článek: stránka si místo pro něj označí sama (rozcestník a stránky kategorií).
+  const ideaSpot = document.querySelector('[data-form="napady"]');
+  if (ideaSpot) {
+    const ideas = document.createElement("section");
+    ideas.className = "fb";
+    ideas.setAttribute("aria-labelledby", "fb-idea-title");
+    ideas.innerHTML = `
+    <h2 id="fb-idea-title">Chybí vám tu něco?</h2>
+    <p class="fb-lede">Napište, co byste chtěli vysvětlit. Uloží se jen váš text, žádné jméno ani adresa.</p>
+    <form novalidate>
+      <div class="fb-field">
+        <label class="label" for="fb-idea">Téma nebo otázka</label>
+        <textarea id="fb-idea" name="idea" maxlength="1000"></textarea>
+      </div>
+      <div class="fb-trap" aria-hidden="true">
+        <label for="fb-idea-website">Tohle pole nechte prázdné</label>
+        <input type="text" id="fb-idea-website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+      <div class="fb-row">
+        <button type="submit" class="btn">Odeslat nápad</button>
+        <p class="fb-note" role="status" aria-live="polite"></p>
+      </div>
+    </form>`;
+    ideaSpot.replaceWith(ideas);
+    const ideaForm = ideas.querySelector("form"), ideaNote = ideas.querySelector(".fb-note");
+    ideaForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const idea = ideaForm.idea.value.trim();
+      if (!idea) return complain(ideaNote, "Napište prosím aspoň pár slov.");
+      submit(ideaForm, ideaNote, { idea }, "Díky, mám to zapsané.");
+    });
+  }
+
+  // Zpětná vazba k tomu, co čtenář právě dočetl. Stránka kategorie je jen seznam, tam nedává smysl.
+  if (document.body.dataset.page === "kategorie") return;
   const box = document.createElement("section");
   box.className = "fb";
   box.setAttribute("aria-labelledby", "fb-title");
@@ -65,7 +130,6 @@
   if (foot) main.insertBefore(box, foot); else main.appendChild(box);
 
   const form = box.querySelector("form"), note = box.querySelector(".fb-note"), seg = box.querySelector(".seg");
-  const shownAt = Date.now();
   let rating = "";
   seg.addEventListener("click", (e) => {
     const b = e.target.closest("button[data-v]");
@@ -74,31 +138,10 @@
     rating = rating === b.dataset.v ? "" : b.dataset.v;
     seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-checked", String(x.dataset.v === rating)));
   });
-  form.addEventListener("submit", async (e) => {
+  form.addEventListener("submit", (e) => {
     e.preventDefault();
     const liked = form.liked.value.trim(), missing = form.missing.value.trim();
-    note.classList.remove("bad");
-    if (!rating && !liked && !missing) { note.classList.add("bad"); note.textContent = "Vyberte aspoň jednu odpověď nebo něco napište."; return; }
-    const button = form.querySelector("button[type=submit]");
-    button.disabled = true;
-    note.textContent = "Odesílám…";
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ article, page: location.pathname, rating, liked, missing, website: form.website.value, elapsed: Date.now() - shownAt }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "");
-      const done = document.createElement("p");
-      done.className = "fb-done";
-      done.setAttribute("role", "status");
-      done.textContent = "Díky, dostal jsem to.";
-      form.replaceWith(done);
-    } catch (err) {
-      button.disabled = false;
-      note.classList.add("bad");
-      note.textContent = err.message || "Nepodařilo se to odeslat. Zkuste to prosím za chvíli.";
-    }
+    if (!rating && !liked && !missing) return complain(note, "Vyberte aspoň jednu odpověď nebo něco napište.");
+    submit(form, note, { rating, liked, missing }, "Díky, dostal jsem to.");
   });
 })();

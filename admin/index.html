@@ -28,7 +28,7 @@
     .head a { color: var(--accent); font-weight: 600; font-size: 0.95rem; }
     .head .grow { flex: 1 1 auto; }
     .tag { font-weight: 600; }
-    .tag.ano { color: var(--ok); } .tag.zcasti { color: var(--warm); } .tag.ne { color: var(--bad); }
+    .tag.ano { color: var(--ok); } .tag.zcasti { color: var(--warm); } .tag.ne { color: var(--bad); } .tag.napad { color: var(--ink-2); }
     .item h3 { margin: 0.7rem 0 0.15rem; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
     .item p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
     .error { color: var(--bad); margin-top: 0.8rem; }
@@ -56,6 +56,7 @@
           <option value="zcasti">Zčásti</option>
           <option value="ne">Nesrozumitelné</option>
           <option value="-">Bez hodnocení</option>
+          <option value="napad">Nápady na články</option>
         </select>
         <span class="grow"></span>
         <button type="button" id="reload">Načíst znovu</button>
@@ -92,9 +93,9 @@
 
     function render() {
       const fa = $("f-article").value, fr = $("f-rating").value;
-      const shown = items.filter((it) => (!fa || it.article === fa) && (!fr || (fr === "-" ? !it.rating : it.rating === fr)));
+      const shown = items.filter((it) => (!fa || it.article === fa) && (!fr || (fr === "napad" ? Boolean(it.idea) : fr === "-" ? !it.rating && !it.idea : it.rating === fr)));
       const count = (r) => items.filter((it) => it.rating === r).length;
-      $("totals").replaceChildren(...[["celkem", items.length], ["srozumitelné", count("ano")], ["zčásti", count("zcasti")], ["nesrozumitelné", count("ne")], ["zobrazeno", shown.length]].map(([name, n]) => { const li = node("li"); li.append(`${name} `, node("b", "", String(n))); return li; }));
+      $("totals").replaceChildren(...[["celkem", items.length], ["srozumitelné", count("ano")], ["zčásti", count("zcasti")], ["nesrozumitelné", count("ne")], ["nápady", items.filter((it) => it.idea).length], ["zobrazeno", shown.length]].map(([name, n]) => { const li = node("li"); li.append(`${name} `, node("b", "", String(n))); return li; }));
       $("empty").hidden = items.length > 0;
       $("list").replaceChildren(...shown.map((it) => {
         const box = node("article", `item ${it.rating || ""}`), head = node("div", "head");
@@ -110,8 +111,10 @@
         });
         head.append(link, node("span", "", when.format(new Date(it.at))));
         if (it.rating) head.append(node("span", `tag ${it.rating}`, RATING[it.rating] || it.rating));
+        if (it.idea) head.append(node("span", "tag napad", "nápad na článek"));
         head.append(node("span", "grow"), del);
         box.append(head);
+        if (it.idea) box.append(node("h3", "", "Nápad na článek"), node("p", "", it.idea));
         if (it.liked) box.append(node("h3", "", "Co se líbilo"), node("p", "", it.liked));
         if (it.missing) box.append(node("h3", "", "Co chybělo nebo nedávalo smysl"), node("p", "", it.missing));
         return box;
