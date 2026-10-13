@@ -76,60 +76,61 @@
   }
   store.set(KEY_POS, positions);
 
-  if (slug) (() => {
-    const saved = positions[path];
-    // konec článku = patička článku se dostala do zorného pole (pod ní je už jen formulář)
-    const atEnd = () => {
-      const foot = main?.querySelector(".art-foot");
-      return foot
-        ? foot.getBoundingClientRect().top < innerHeight
-        : scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
-    };
-    if (saved > 0 && !location.hash) {
-      scrollTo(0, saved);
-      // po načtení písem se stránka může posunout; dokud čtenář sám nepohne, pozice se srovná znovu
-      let moved = false;
-      for (const ev of ["wheel", "touchstart", "keydown", "pointerdown"])
-        addEventListener(
-          ev,
-          () => {
-            moved = true;
-          },
-          { once: true, passive: true }
-        );
-      const again = () => {
-        if (!moved) scrollTo(0, saved);
+  if (slug)
+    (() => {
+      const saved = positions[path];
+      // konec článku = patička článku se dostala do zorného pole (pod ní je už jen formulář)
+      const atEnd = () => {
+        const foot = main?.querySelector(".art-foot");
+        return foot
+          ? foot.getBoundingClientRect().top < innerHeight
+          : scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
       };
-      addEventListener("load", again, { once: true });
-      document.fonts?.ready.then(again);
-    }
-    let timer = 0;
-    const save = () => {
-      timer = 0;
-      const all = store.get(KEY_POS, {});
-      if (atEnd() || readMap()[slug]) delete all[path];
-      else all[path] = Math.round(scrollY);
-      store.set(KEY_POS, all);
-      const h1 = document.querySelector("h1");
-      store.set(KEY_LAST, {
-        slug,
-        href: path,
-        title: h1 ? h1.textContent.trim() : slug,
-        t: Date.now(),
+      if (saved > 0 && !location.hash) {
+        scrollTo(0, saved);
+        // po načtení písem se stránka může posunout; dokud čtenář sám nepohne, pozice se srovná znovu
+        let moved = false;
+        for (const ev of ["wheel", "touchstart", "keydown", "pointerdown"])
+          addEventListener(
+            ev,
+            () => {
+              moved = true;
+            },
+            { once: true, passive: true }
+          );
+        const again = () => {
+          if (!moved) scrollTo(0, saved);
+        };
+        addEventListener("load", again, { once: true });
+        document.fonts?.ready.then(again);
+      }
+      let timer = 0;
+      const save = () => {
+        timer = 0;
+        const all = store.get(KEY_POS, {});
+        if (atEnd() || readMap()[slug]) delete all[path];
+        else all[path] = Math.round(scrollY);
+        store.set(KEY_POS, all);
+        const h1 = document.querySelector("h1");
+        store.set(KEY_LAST, {
+          slug,
+          href: path,
+          title: h1 ? h1.textContent.trim() : slug,
+          t: Date.now(),
+        });
+      };
+      addEventListener(
+        "scroll",
+        () => {
+          if (!timer) timer = setTimeout(save, 400);
+        },
+        { passive: true }
+      );
+      addEventListener("pagehide", save);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") save();
       });
-    };
-    addEventListener(
-      "scroll",
-      () => {
-        if (!timer) timer = setTimeout(save, 400);
-      },
-      { passive: true }
-    );
-    addEventListener("pagehide", save);
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") save();
-    });
-  })();
+    })();
 
   /* ---------- přečtené články: tlačítko v článku ---------- */
   if (slug && main) {
