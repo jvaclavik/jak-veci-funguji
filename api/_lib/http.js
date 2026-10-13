@@ -45,7 +45,9 @@ export function isAdmin(req) {
   const expected = process.env.ADMIN_PASSWORD || "";
   if (expected.length < 8) return false;
   const auth = req.headers.authorization || "";
-  const given = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  let given = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  // administrace heslo posílá zakódované, aby v něm mohla být i písmena s diakritikou
+  try { given = decodeURIComponent(given); } catch { /* nezakódované heslo se porovná tak, jak přišlo */ }
   const a = createHash("sha256").update(given).digest(), b = createHash("sha256").update(expected).digest();
   return timingSafeEqual(a, b);
 }

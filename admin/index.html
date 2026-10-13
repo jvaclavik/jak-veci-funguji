@@ -78,7 +78,8 @@
     let pass = sessionStorage.getItem("jvf-admin") || "", items = [];
 
     async function call(method, query = "") {
-      const res = await fetch(`/api/admin${query}`, { method, headers: { Authorization: `Bearer ${pass}` } });
+      // hlavička unese jen základní znaky, heslo s háčky a čárkami se proto posílá zakódované
+      const res = await fetch(`/api/admin${query}`, { method, headers: { Authorization: `Bearer ${encodeURIComponent(pass)}` } });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw Object.assign(new Error(data.error || "Něco se nepovedlo."), { status: res.status });
       return data;
