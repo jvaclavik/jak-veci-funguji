@@ -67,10 +67,24 @@
     return toastBox;
   }
 
-  /* ---------- pozice čtení ---------- */
-  (() => {
-    const positions = store.get(KEY_POS, {});
+  /* ---------- pozice čtení: jen u článků, po dočtení nebo označení se zapomene ---------- */
+  const positions = store.get(KEY_POS, {});
+  // úklid po starších verzích, které si pamatovaly i rozcestník a staré adresy
+  for (const k of Object.keys(positions)) {
+    const s = k.split("/").filter(Boolean);
+    if (s.length !== 2 || s[0] === "clanky") delete positions[k];
+  }
+  store.set(KEY_POS, positions);
+
+  if (slug) (() => {
     const saved = positions[path];
+    // konec článku = patička článku se dostala do zorného pole (pod ní je už jen formulář)
+    const atEnd = () => {
+      const foot = main?.querySelector(".art-foot");
+      return foot
+        ? foot.getBoundingClientRect().top < innerHeight
+        : scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
+    };
     if (saved > 0 && !location.hash) {
       scrollTo(0, saved);
       // po načtení písem se stránka může posunout; dokud čtenář sám nepohne, pozice se srovná znovu
@@ -93,17 +107,16 @@
     const save = () => {
       timer = 0;
       const all = store.get(KEY_POS, {});
-      all[path] = Math.round(scrollY);
+      if (atEnd() || readMap()[slug]) delete all[path];
+      else all[path] = Math.round(scrollY);
       store.set(KEY_POS, all);
-      if (slug) {
-        const h1 = document.querySelector("h1");
-        store.set(KEY_LAST, {
-          slug,
-          href: path,
-          title: h1 ? h1.textContent.trim() : slug,
-          t: Date.now(),
-        });
-      }
+      const h1 = document.querySelector("h1");
+      store.set(KEY_LAST, {
+        slug,
+        href: path,
+        title: h1 ? h1.textContent.trim() : slug,
+        t: Date.now(),
+      });
     };
     addEventListener(
       "scroll",
