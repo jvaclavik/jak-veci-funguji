@@ -10,6 +10,11 @@
       "source": "/:slug(abs|barevne-videni|beztize|blesk|bluetooth|carovy-kod|dedicnost|diferencial|dotykovy-displej|duha|faze-mesice|fotak|gps|husi-kuze|komprese-obrazku|kychani|lcd-oled|lednicka|letadlo|letokruhy|mikrovlnka|modre-nebe|mosty|motor|oko|plachetnice|ponorka|potlaceni-hluku|prehazovacka|priliv|qr-kod|reflex|scitani|sluch|splachovani|termoska|var-vody|wifi|zacpa|zamek|zelena-vlna|zemetreseni)",
       "destination": "/clanky/:slug/",
       "permanent": true
+    },
+    {
+      "source": "/:slug(abs|barevne-videni|beztize|blesk|bluetooth|carovy-kod|dedicnost|diferencial|dotykovy-displej|duha|faze-mesice|fotak|gps|husi-kuze|komprese-obrazku|kychani|lcd-oled|lednicka|letadlo|letokruhy|mikrovlnka|modre-nebe|mosty|motor|oko|plachetnice|ponorka|potlaceni-hluku|prehazovacka|priliv|qr-kod|reflex|scitani|sluch|splachovani|termoska|var-vody|wifi|zacpa|zamek|zelena-vlna|zemetreseni)/",
+      "destination": "/clanky/:slug/",
+      "permanent": true
     }
   ],
   "headers": [
