@@ -67,7 +67,7 @@
     ideas.setAttribute("aria-labelledby", "fb-idea-title");
     ideas.innerHTML = `
     <h2 id="fb-idea-title">Chybí vám tu něco?</h2>
-    <p class="fb-lede">Napište, co byste chtěli vysvětlit. Uloží se jen váš text, žádné jméno ani adresa.</p>
+    <p class="fb-lede">Napište, co byste chtěli vysvětlit.</p>
     <form novalidate>
       <div class="fb-field">
         <label class="label" for="fb-idea">Téma nebo otázka</label>
