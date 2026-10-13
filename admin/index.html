@@ -12,6 +12,9 @@
     body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
     main { max-width: 60rem; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
     h1 { margin: 0 0 0.25rem; font-size: 1.6rem; }
+    .home { margin: 0 0 1rem; font-size: 0.9rem; }
+    .home a { color: var(--ink-2); }
+    .home a:hover { color: var(--ink); }
     .muted { color: var(--ink-3); font-size: 0.9rem; }
     form.login { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.5rem; }
     input, select, button { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--ink-3); padding: 0.5rem 0.7rem; border-radius: 0; }
@@ -37,6 +40,7 @@
 </head>
 <body>
   <main>
+    <p class="home"><a href="../">← Jak věci fungují</a></p>
     <h1>Zpětná vazba</h1>
     <p class="muted">Odpovědi čtenářů k článkům Jak věci fungují.</p>
 
@@ -98,7 +102,7 @@
       const fa = $("f-article").value, fr = $("f-rating").value;
       const shown = items.filter((it) => (!fa || it.article === fa) && (!fr || (fr === "napad" ? Boolean(it.idea) : fr === "-" ? !it.rating && !it.idea : it.rating === fr)));
       const count = (r) => items.filter((it) => it.rating === r).length;
-      $("totals").replaceChildren(...[["celkem", items.length], ["srozumitelné", count("ano")], ["zčásti", count("zcasti")], ["nesrozumitelné", count("ne")], ["nápady", items.filter((it) => it.idea).length], ["zobrazeno", shown.length]].map(([name, n]) => { const li = node("li"); li.append(`${name} `, node("b", "", String(n))); return li; }));
+      $("totals").replaceChildren(...[["celkem", items.length], ["srozumitelné", count("ano")], ["zčásti", count("zcasti")], ["nesrozumitelné", count("ne")], ["nápady", items.filter((it) => it.idea).length], ...(fa || fr ? [["zobrazeno", shown.length]] : [])].map(([name, n]) => { const li = node("li"); li.append(`${name} `, node("b", "", String(n))); return li; }));
       $("empty").hidden = items.length > 0;
       $("list").replaceChildren(...shown.map((it) => {
         const box = node("article", `item ${it.rating || ""}`), head = node("div", "head");
