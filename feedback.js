@@ -1,19 +1,15 @@
-/* Formulář zpětné vazby pod každým článkem. Odpověď pošle funkci na Vercelu,
+/* Formulář zpětné vazby pod každým článkem. Odpověď pošle funkci na stejné adrese,
    která ji uloží jako soubor. Neposílá se nic kromě toho, co čtenář vyplní, a názvu článku. */
 (() => {
-  // Na Vercelu běží funkce na stejné adrese jako web. Kopie na GitHub Pages funkce nemá
-  // a posílá odpovědi na adresu z REMOTE; dokud je prázdná, formulář se tam nezobrazí.
-  const REMOTE = "https://jak-veci-funguji.vercel.app";
-  const onPages = location.hostname.endsWith("github.io");
-  const endpoint = onPages ? (REMOTE ? `${REMOTE.replace(/\/$/, "")}/api/feedback` : "") : "/api/feedback";
-  if (!endpoint || location.pathname.includes("/admin/")) return;
+  const endpoint = "/api/feedback";
+  if (location.pathname.includes("/admin/")) return;
 
   const main = document.querySelector("main");
   if (!main) return;
   // název článku je poslední složka adresy; rozcestník žádnou vlastní nemá
   const parts = location.pathname.split("/").filter((p) => p && p !== "index.html");
   const last = parts[parts.length - 1] || "";
-  const article = !last || last === "jak-veci-funguji" ? "rozcestnik" : last;
+  const article = last || "rozcestnik";
 
   const style = document.createElement("style");
   style.textContent = `

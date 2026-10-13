@@ -1,8 +1,8 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 
-// Odkud smí formulář posílat odpovědi: z tohohle webu samotného a z jeho starší kopie na GitHub Pages.
+// Odkud smí formulář posílat odpovědi: z tohohle webu samotného, případně z adres v ALLOWED_ORIGINS.
 // Jiný web je nepošle, ani kdyby okopíroval celý formulář.
-const ALLOWED = (process.env.ALLOWED_ORIGINS || "https://mamartin.github.io").split(",").map((s) => s.trim()).filter(Boolean);
+const ALLOWED = (process.env.ALLOWED_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
 function sameSite(req, origin) {
   try { return new URL(origin).host === (req.headers["x-forwarded-host"] || req.headers.host); } catch { return false; }
 }

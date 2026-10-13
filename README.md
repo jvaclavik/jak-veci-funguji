@@ -2,16 +2,14 @@
 
 Články s interaktivními modely. Každý článek je samostatná stránka ve vlastní složce, společné jsou jen `style.css` a `feedback.js`.
 
-Web jde nasadit dvěma způsoby. Na GitHub Pages běží jen stránky. Na Vercelu k nim přibudou dvě funkce ve složce `api/`, které přijímají zpětnou vazbu čtenářů a ukládají ji jako soubory JSON do úložiště Vercel Blob. Stránka `admin/` odpovědi po zadání hesla zobrazí.
+Web běží na Vercelu na adrese <https://jak-veci-funguji.vercel.app>. Každý commit do větve `main` se nasadí sám. Vedle stránek jsou ve složce `api/` dvě funkce, které přijímají zpětnou vazbu čtenářů a ukládají ji jako soubory JSON do úložiště Vercel Blob. Stránka `admin/` odpovědi po zadání hesla zobrazí.
 
 ## Nastavení na Vercelu
 
-1. Nový projekt z repozitáře `mamartin/mamartin.github.io`, **Root Directory** `jak-veci-funguji`.
-2. V projektu záložka Storage: vytvořit úložiště **Blob** s přístupem **Private** a připojit ho k projektu.
-3. Settings → Environment Variables: přidat `ADMIN_PASSWORD` (aspoň 8 znaků).
-4. Znovu nasadit (Deployments → Redeploy), aby se nastavení projevilo.
-
-Formulář pod články se na Vercelu zapne sám. Aby fungoval i na kopii na GitHub Pages, zapíše se adresa projektu do konstanty `REMOTE` v `feedback.js`.
+1. Projekt je připojený k tomuhle repozitáři, **Root Directory** je prázdný.
+2. V levém menu projektu Storage: úložiště **Blob** s přístupem **Private**, připojené k projektu.
+3. V levém menu projektu Environment Variables: `ADMIN_PASSWORD` (aspoň 8 znaků).
+4. Po změně nastavení znovu nasadit (Deployments → Redeploy), jinak se neprojeví.
 
 ## Lokální zkoušení
 
