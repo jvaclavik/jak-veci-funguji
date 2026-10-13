@@ -7,13 +7,123 @@
   },
   "redirects": [
     {
-      "source": "/:slug(abs|barevne-videni|beztize|blesk|bluetooth|carovy-kod|dedicnost|diferencial|dotykovy-displej|duha|faze-mesice|fotak|gps|husi-kuze|komprese-obrazku|kychani|lcd-oled|lednicka|letadlo|letokruhy|mikrovlnka|modre-nebe|mosty|motor|oko|plachetnice|ponorka|potlaceni-hluku|prehazovacka|priliv|qr-kod|reflex|scitani|sluch|splachovani|termoska|var-vody|wifi|zacpa|zamek|zelena-vlna|zemetreseni)",
-      "destination": "/clanky/:slug/",
+      "source": "/:slug(zamek|lednicka|mikrovlnka|var-vody|termoska|splachovani)",
+      "destination": "/domacnost/:slug/",
       "permanent": true
     },
     {
-      "source": "/:slug(abs|barevne-videni|beztize|blesk|bluetooth|carovy-kod|dedicnost|diferencial|dotykovy-displej|duha|faze-mesice|fotak|gps|husi-kuze|komprese-obrazku|kychani|lcd-oled|lednicka|letadlo|letokruhy|mikrovlnka|modre-nebe|mosty|motor|oko|plachetnice|ponorka|potlaceni-hluku|prehazovacka|priliv|qr-kod|reflex|scitani|sluch|splachovani|termoska|var-vody|wifi|zacpa|zamek|zelena-vlna|zemetreseni)/",
-      "destination": "/clanky/:slug/",
+      "source": "/:slug(zamek|lednicka|mikrovlnka|var-vody|termoska|splachovani)/",
+      "destination": "/domacnost/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(zamek|lednicka|mikrovlnka|var-vody|termoska|splachovani)",
+      "destination": "/domacnost/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(zamek|lednicka|mikrovlnka|var-vody|termoska|splachovani)/",
+      "destination": "/domacnost/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/:slug(gps|qr-kod|carovy-kod|wifi|bluetooth|dotykovy-displej|lcd-oled|fotak|komprese-obrazku|potlaceni-hluku|scitani)",
+      "destination": "/technika/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/:slug(gps|qr-kod|carovy-kod|wifi|bluetooth|dotykovy-displej|lcd-oled|fotak|komprese-obrazku|potlaceni-hluku|scitani)/",
+      "destination": "/technika/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(gps|qr-kod|carovy-kod|wifi|bluetooth|dotykovy-displej|lcd-oled|fotak|komprese-obrazku|potlaceni-hluku|scitani)",
+      "destination": "/technika/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(gps|qr-kod|carovy-kod|wifi|bluetooth|dotykovy-displej|lcd-oled|fotak|komprese-obrazku|potlaceni-hluku|scitani)/",
+      "destination": "/technika/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/:slug(abs|prehazovacka|diferencial|motor|zacpa|zelena-vlna|letadlo|plachetnice|ponorka|mosty)",
+      "destination": "/doprava/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/:slug(abs|prehazovacka|diferencial|motor|zacpa|zelena-vlna|letadlo|plachetnice|ponorka|mosty)/",
+      "destination": "/doprava/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(abs|prehazovacka|diferencial|motor|zacpa|zelena-vlna|letadlo|plachetnice|ponorka|mosty)",
+      "destination": "/doprava/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(abs|prehazovacka|diferencial|motor|zacpa|zelena-vlna|letadlo|plachetnice|ponorka|mosty)/",
+      "destination": "/doprava/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/:slug(modre-nebe|blesk|duha|zemetreseni|letokruhy)",
+      "destination": "/priroda/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/:slug(modre-nebe|blesk|duha|zemetreseni|letokruhy)/",
+      "destination": "/priroda/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(modre-nebe|blesk|duha|zemetreseni|letokruhy)",
+      "destination": "/priroda/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(modre-nebe|blesk|duha|zemetreseni|letokruhy)/",
+      "destination": "/priroda/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/:slug(kychani|oko|barevne-videni|sluch|reflex|husi-kuze|dedicnost)",
+      "destination": "/lidske-telo/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/:slug(kychani|oko|barevne-videni|sluch|reflex|husi-kuze|dedicnost)/",
+      "destination": "/lidske-telo/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(kychani|oko|barevne-videni|sluch|reflex|husi-kuze|dedicnost)",
+      "destination": "/lidske-telo/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(kychani|oko|barevne-videni|sluch|reflex|husi-kuze|dedicnost)/",
+      "destination": "/lidske-telo/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/:slug(faze-mesice|priliv|beztize)",
+      "destination": "/vesmir/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/:slug(faze-mesice|priliv|beztize)/",
+      "destination": "/vesmir/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(faze-mesice|priliv|beztize)",
+      "destination": "/vesmir/:slug/",
+      "permanent": true
+    },
+    {
+      "source": "/clanky/:slug(faze-mesice|priliv|beztize)/",
+      "destination": "/vesmir/:slug/",
       "permanent": true
     }
   ],

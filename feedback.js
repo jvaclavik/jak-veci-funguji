@@ -86,7 +86,7 @@
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ article, rating, liked, missing, website: form.website.value, elapsed: Date.now() - shownAt }),
+        body: JSON.stringify({ article, page: location.pathname, rating, liked, missing, website: form.website.value, elapsed: Date.now() - shownAt }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "");

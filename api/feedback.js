@@ -22,6 +22,8 @@ export default async function handler(req, res) {
   try { body = await readJson(req); } catch { return send(res, 400, { error: "Zprávu se nepodařilo přečíst." }, headers); }
 
   const article = typeof body.article === "string" && /^[a-z0-9-]{1,40}$/.test(body.article) ? body.article : "";
+  // adresa stránky, ze které odpověď přišla, aby na ni administrace uměla odkázat
+  const page = typeof body.page === "string" && body.page.length <= 100 && /^\/([a-z0-9-]+\/)*$/.test(body.page) ? body.page : "";
   const rating = RATINGS.includes(body.rating) ? body.rating : "";
   const liked = clean(body.liked), missing = clean(body.missing);
   if (!article) return send(res, 400, { error: "Chybí název článku." }, headers);
@@ -39,7 +41,7 @@ export default async function handler(req, res) {
   const at = new Date(now), stamp = at.toISOString().replace(/[-:.]/g, "").slice(0, 15).toLowerCase();
   const path = `feedback/${at.toISOString().slice(0, 7)}/${stamp}-${article}-${randomBytes(4).toString("hex")}.json`;
   try {
-    await save(path, { at: at.toISOString(), article, rating, liked, missing });
+    await save(path, { at: at.toISOString(), article, page, rating, liked, missing });
   } catch (err) {
     console.error("Uložení odpovědi selhalo:", err);
     return send(res, 500, { error: "Zprávu se nepodařilo uložit." }, headers);
