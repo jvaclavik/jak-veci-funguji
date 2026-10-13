@@ -240,6 +240,8 @@ a {
   color: var(--cat);
 }
 .eyebrow::before { content: ""; width: 0.7em; height: 0.7em; background: var(--cat); }
+.eyebrow a { color: inherit; text-decoration: none; }
+.eyebrow a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
 .art-head h1 { margin: 0; font-size: clamp(2.3rem, 6.2vw, 4.4rem); }
 .lede {
   margin: 0;
