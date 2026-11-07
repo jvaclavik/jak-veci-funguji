@@ -13,7 +13,7 @@
     gtag('config', 'G-3FQVWCDJ6V');
   </script>
   <title>Jak funguje lednička</title>
-  <meta name="description" content="Proč lednička nevyrábí chlad, ale přečerpává teplo, co v ní bzučí a proč vzadu hřeje. S interaktivním modelem chladicího okruhu.">
+  <meta name="description" content="Proč lednička nevyrábí chlad, ale přečerpává teplo, co v ní bzučí a proč vzadu hřeje. S interaktivním modelem chladicího okruhu, srovnáním s klimatizací a tepelným čerpadlem, jeho zdroji tepla a fotovoltaikou.">
   <link rel="stylesheet" href="/style.css?v=8">
   <link rel="manifest" href="/manifest.webmanifest">
   <meta name="theme-color" content="#f1f2ed" media="(prefers-color-scheme: light)">
@@ -108,10 +108,61 @@
     .legend svg { width: 2.4rem; height: 0.6rem; flex: none; }
     .legend line { stroke: var(--ink-2); stroke-width: 4.2; stroke-linecap: round; }
 
+    /* obr. 2: jeden okruh, tři stroje */
+    .brick-bg { fill: var(--steel); }
+    .brick-ln { fill: none; stroke: var(--steel-hatch); stroke-width: 1; }
+    .f-brick { fill: url(#cmp-brick); }
+    .f-insul2 { fill: url(#cmp-insul); }
+    .zone { transition: opacity 0.5s, fill 0.5s; }
+    .pic { fill: none; stroke: var(--ink-3); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; opacity: 0; transition: opacity 0.5s; }
+    .pic.on { opacity: 1; }
+    .pic .solid { fill: var(--sunk); }
+    .pic .sun { stroke: var(--warm); }
+    .pic .snow { stroke: var(--cool); stroke-width: 2.2; }
+    .valve { fill: var(--surface); stroke: var(--metal-line); stroke-width: 1.4; }
+    .want { fill: var(--cat); font: 600 12px var(--font-mono); letter-spacing: 0.08em; }
+    .want.muted { fill: var(--ink-3); }
+    .coil-name { fill: var(--ink); font: 600 14px var(--font-mono); text-anchor: middle; }
+    .callout .coil-sub { fill: var(--ink-2); font: 500 12px var(--font-mono); text-anchor: middle; }
+    .stats li.dim { border-top-color: var(--rule); }
+    .want.warn { fill: var(--hot); }
+    .pic .soil { fill: var(--plug); stroke: none; opacity: 0.55; }
+    .pic .aquifer { fill: var(--cold); stroke: none; opacity: 0.22; }
+    .pic .shaft { fill: var(--surface); }
+    .pic .loop { stroke: var(--cool); stroke-width: 2.6; }
+    .pic .loop.warm { stroke: var(--warm); stroke-width: 2; }
+    .pic .panel { fill: var(--cold); fill-opacity: 0.35; stroke: var(--metal-line); }
+    .pic .panel-ln { stroke: var(--metal-line); stroke-width: 1; }
+
+    .hp-charts { display: grid; gap: 1rem 2rem; }
+    .chart { display: grid; gap: 0.35rem; min-width: 0; margin: 0; }
+    .chart svg { display: block; width: 100%; height: auto; touch-action: none; }
+    .ch-grid { stroke: var(--rule); stroke-width: 1; }
+    .ch-base { stroke: var(--ink-3); stroke-width: 1; }
+    .ch-tick { fill: var(--ink-3); font: 500 11px var(--font-mono); }
+    .ch-lbl { fill: var(--ink-2); font: 500 12px var(--font-mono); }
+    .ch-lbl.strong { fill: var(--ink); font-weight: 600; }
+    .ch-val { fill: var(--ink); font: 600 12px var(--font-mono); }
+    .ch-need { fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-dasharray: 6 4; }
+    .ch-max { fill: none; stroke: var(--cat); stroke-width: 2.5; stroke-linejoin: round; }
+    .ch-other { fill: none; stroke: var(--ink-3); stroke-width: 1.5; stroke-dasharray: 4 4; }
+    .ch-gap { fill: var(--hot); opacity: 0.18; }
+    .ch-marker { stroke: var(--ink-3); stroke-width: 1; }
+    .ch-dot { fill: var(--ink); stroke: var(--surface); stroke-width: 2; }
+    .ch-hit { fill: transparent; cursor: ew-resize; }
+
     @media (max-width: 46rem) {
       .callout, .desk { display: none; }
       .mk { transform: scale(1.6); }
       .readout th:nth-child(2), .readout td:nth-child(2) { display: none; }
+      #cmp .r-cap { font-size: 20px; }
+      #cmp .r-val { font-size: 42px; }
+      #cmp .want { font-size: 17px; }
+      #cmp .coil-name { font-size: 22px; }
+      .stats { grid-template-columns: 1fr; }
+    }
+    @media (min-width: 60rem) {
+      .hp-charts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     }
     @media (min-width: 60rem) {
       .fr-status { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; gap: 2rem; }
@@ -142,6 +193,7 @@
         <li>V trubkách obíhá chladivo. Uvnitř ledničky se <span class="hl">vypařuje</span> a bere si na to teplo z potravin.</li>
         <li>Kompresor páru stlačí. Na zadní mřížce pak pára zkapalní a teplo odevzdá do kuchyně.</li>
         <li>Termostat kompresor zapíná a vypíná. Většinu dne lednička stojí.</li>
+        <li>Klimatizace a tepelné čerpadlo jsou stejný stroj. Liší se jen tím, co mají na studené a co na teplé straně.</li>
       </ul>
     </section>
 
@@ -265,7 +317,6 @@
         <h2 id="h-topi">Proč lednička topí</h2>
         <p>Teplo, které lednička odebere potravinám, nezmizí. Skončí na zadní mřížce a přidá se k němu ještě energie, kterou spotřeboval kompresor. Do kuchyně tak lednička vždycky vydá víc tepla, než kolik ho uvnitř odebrala.</p>
         <p>Proto se kuchyně otevřenou ledničkou ochladit nedá. Studený vzduch vám sice ovane nohy, ale zadní mřížka do stejné místnosti vrací všechno to teplo a ještě něco navíc. Místnost se pomalu ohřívá.</p>
-        <p>Stejný stroj, jen otočený, je <span class="hl">tepelné čerpadlo.</span> Výparník má venku, kde bere teplo ze studeného vzduchu, a kondenzátorem topí v domě. Klimatizace to dělá obráceně.</p>
       </div>
       <aside class="note" aria-label="Poznámka na okraj">
         <span class="label">Zkuste</span>
@@ -281,6 +332,175 @@
         <p>Námraza na zadní stěně je vlhkost ze vzduchu, která na výparníku zmrzla. Tenká vrstva nevadí, tlustá ale funguje jako izolace a ledničce překáží. Ledničky s funkcí No Frost mají výparník schovaný za stěnou, ofukují ho ventilátorem a čas od času ho krátce ohřejí, aby led odtál.</p>
         <p>Po stěhování nechte ledničku pár hodin stát, než ji zapnete, hlavně když cestovala naležato. V kompresoru je olej, který se při naklonění může dostat do trubek, a potřebuje čas stéct zpátky.</p>
       </div>
+    </section>
+
+    <section class="sec" aria-labelledby="h-stroje">
+      <div class="prose">
+        <h2 id="h-stroje">Jeden okruh, tři stroje</h2>
+        <p>Kompresor, kondenzátor, škrticí člen a výparník. Tyhle čtyři díly najdete v ledničce, v klimatizaci i v tepelném čerpadle. Všechny tři stroje dělají totéž: na studené straně teplo berou a na teplé ho odevzdávají. Liší se jen tím, co je na které straně a která strana je pro vás užitečná.</p>
+        <p>Lednička a klimatizace chtějí studenou stranu, vnitřek ledničky nebo pokoj. Teplo na druhé straně je odpad, který skončí v kuchyni nebo na ulici. <span class="hl">Tepelné čerpadlo to má obráceně.</span> Studenou stranu má venku, kde bere teplo z mrazivého vzduchu, a užitečná je ta teplá, která ohřívá vodu do topení.</p>
+      </div>
+      <aside class="note" aria-label="Poznámka na okraj">
+        <span class="label">Zkuste</span>
+        <p>Přepínejte v obrázku 2 mezi stroji. Trubky ani díly se nepohnou. Změní se jen to, co je kolem nich, a čísla.</p>
+      </aside>
+    </section>
+
+    <figure class="fig" id="obr2">
+      <div class="fig-head">
+        <p class="fig-num"><b>Obr. 2</b> Lednička, klimatizace a tepelné čerpadlo</p>
+        <span class="label">Přepněte stroj nebo změňte teplotu</span>
+      </div>
+      <div class="fig-stage">
+        <svg id="cmp" viewBox="0 0 940 470" role="img" aria-label="Schéma chladicího okruhu přes zeď: vlevo studená strana s výparníkem, vpravo teplá strana s kondenzátorem a kompresorem. Podle zvoleného stroje se mění, co je na které straně.">
+          <defs>
+            <pattern id="cmp-insul" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
+              <rect width="7" height="7" class="insul-bg"/>
+              <line x1="0" y1="0" x2="0" y2="7" class="insul-ln"/>
+            </pattern>
+            <pattern id="cmp-brick" width="20" height="12" patternUnits="userSpaceOnUse">
+              <rect width="20" height="12" class="brick-bg"/>
+              <path d="M0 0.5 H20 M0 6.5 H20 M10 0.5 V6.5 M0.5 6.5 V12" class="brick-ln"/>
+            </pattern>
+          </defs>
+        </svg>
+      </div>
+      <div class="fig-controls">
+        <div class="ctl">
+          <span class="label" id="lbl-mode">Stroj</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lbl-mode" id="mode-seg">
+            <button type="button" role="radio" data-v="fridge" aria-checked="true">Lednička</button>
+            <button type="button" role="radio" data-v="ac" aria-checked="false">Klimatizace</button>
+            <button type="button" role="radio" data-v="hp" aria-checked="false">Tepelné čerpadlo</button>
+          </div>
+        </div>
+        <div class="ctl ctl-grow">
+          <label class="label" for="cmp-t" id="cmp-t-lbl">Teplota v kuchyni</label>
+          <div class="ctl-row">
+            <input type="range" id="cmp-t" min="16" max="35" step="1" value="22">
+            <output class="val" id="cmp-t-val" for="cmp-t">22 °C</output>
+          </div>
+        </div>
+      </div>
+      <div class="fig-controls" id="hp-controls" hidden>
+        <div class="ctl">
+          <span class="label" id="lbl-src">Zdroj tepla</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lbl-src" id="src-seg">
+            <button type="button" role="radio" data-v="air" aria-checked="true">Vzduch</button>
+            <button type="button" role="radio" data-v="ground" aria-checked="false">Vrt</button>
+            <button type="button" role="radio" data-v="water" aria-checked="false">Studna</button>
+          </div>
+        </div>
+        <div class="ctl">
+          <span class="label" id="lbl-snk">Topení</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lbl-snk" id="snk-seg">
+            <button type="button" role="radio" data-v="floor" aria-checked="true">Podlahové</button>
+            <button type="button" role="radio" data-v="rad" aria-checked="false">Radiátory</button>
+            <button type="button" role="radio" data-v="air" aria-checked="false">Vzduch</button>
+          </div>
+        </div>
+        <div class="ctl ctl-grow">
+          <label class="label" for="cmp-pv-in">Fotovoltaika teď dává</label>
+          <div class="ctl-row">
+            <input type="range" id="cmp-pv-in" min="0" max="8" step="0.5" value="0">
+            <output class="val" id="cmp-pv-val" for="cmp-pv-in">0,0 kW</output>
+          </div>
+        </div>
+      </div>
+      <div class="fig-status">
+        <p class="status" id="cmp-status" aria-live="polite"></p>
+        <ul class="stats" id="cmp-stats">
+          <li><span class="n"></span><span class="v"></span></li>
+          <li class="dim"><span class="n">elektřina pro kompresor</span><span class="v"></span></li>
+          <li class="dim"><span class="n"></span><span class="v"></span></li>
+        </ul>
+        <p class="formula" id="cmp-cop"></p>
+        <p class="formula" id="cmp-lift" hidden></p>
+        <p class="formula" id="cmp-pv" hidden></p>
+        <div class="hp-charts" id="hp-charts" hidden>
+          <figure class="chart">
+            <span class="label">Výkon podle teploty venku</span>
+            <svg id="ch-power" viewBox="0 0 470 232" role="img" aria-label="Graf: tepelná ztráta domu roste s mrazem, nejvyšší výkon čerpadla klesá. Kde se čáry překříží, musí dotápět patrona."></svg>
+          </figure>
+          <figure class="chart">
+            <span class="label">Topný faktor podle teploty venku</span>
+            <svg id="ch-cop" viewBox="0 0 470 232" role="img" aria-label="Graf: topný faktor pro zdroj vzduch, vrt a studna. U vzduchu s mrazem klesá, u vrtu a studny zůstává skoro stejný."></svg>
+          </figure>
+        </div>
+      <figcaption class="fig-caption">Zjednodušený model. Výkony odpovídají běžné ledničce a klimatizaci do jednoho pokoje. U tepelného čerpadla je to rodinný dům, který při −15 °C venku ztrácí 7 kW, a čerpadlo s kompresorem o příkonu nejvýš 2,5 kW. Teplotu vody do topení řídí ekvitermní regulace. V grafech můžete teplotu venku měnit i tažením. Chladiva: v ledničce isobutan (R600a), v klimatizaci R32, v tepelném čerpadle propan (R290). Tlaky jsou absolutní.</figcaption>
+    </figure>
+
+    <section class="sec" aria-labelledby="h-cerpadlo">
+      <div class="prose">
+        <h2 id="h-cerpadlo">Tepelné čerpadlo: teplo z mrazu</h2>
+        <p>Zní to divně, ale i vzduch o teplotě −10 °C v sobě teplo má. Studený je jen ve srovnání s námi. Chladivo ve venkovní jednotce stačí udělat ještě studenější, třeba −18 °C, a teplo ze vzduchu do něj poteče samo, stejně jako do výparníku v ledničce teče teplo z jogurtu.</p>
+        <p>Výhodné je to kvůli účtu. Do domu se dostane teplo vzaté venku a navíc všechna elektřina, kterou spotřeboval kompresor. Z jedné kilowatthodiny elektřiny tak bývá tři až čtyři kilowatthodiny tepla. <span class="hl">Elektrický kotel nebo přímotop z ní udělá právě jednu.</span></p>
+      </div>
+      <aside class="note" aria-label="Tepelné čerpadlo v číslech">
+        <span class="label">V číslech</span>
+        <dl class="facts">
+          <div><dt>3–4 kWh</dt><dd>tepla z 1 kWh elektřiny v průměru za topnou sezónu</dd></div>
+          <div><dt>−20 °C</dt><dd>do takového mrazu běžná čerpadla vzduch–voda ještě topí</dd></div>
+          <div><dt>35 / 55 °C</dt><dd>voda pro podlahové topení a pro radiátory v největších mrazech</dd></div>
+        </dl>
+      </aside>
+    </section>
+
+    <section class="sec" aria-labelledby="h-mraz">
+      <div class="prose">
+        <h2 id="h-mraz">Co se změní, když venku mrzne</h2>
+        <p>Kompresor musí teplo vytáhnout z teploty, při které chladivo vře, na teplotu, při které kapalní. Tomu rozdílu se říká <span class="hl">teplotní zdvih</span> a je to nejdůležitější číslo celého čerpadla. Čím je větší, tím víc práce stojí každá kilowatthodina tepla.</p>
+        <p>Při 10 °C venku vře chladivo ve venkovní jednotce kolem 2 °C. Podlahovému topení stačí voda o 25 °C, chladivo tedy kapalní kolem 30 °C. Zdvih je 28 °C a z kilowatthodiny elektřiny je přes 5 kWh tepla. Při −10 °C vře chladivo při −18 °C, voda musí mít 33 °C a zdvih vyroste na 56 °C. Z kilowatthodiny je pak necelé 3 kWh tepla.</p>
+        <p>K tomu se přidá druhá potíž. Dům v mrazu ztrácí víc tepla: náš vzorový dům při 10 °C asi 2 kW, při −10 °C už 6 kW. Čerpadlo má přitom kompresor s omezeným příkonem, takže s horším topným faktorem dá i méně tepla. Navíc v mrazu nasává řidší páru. Potřeba domu roste a výkon čerpadla klesá. Teplotě, při které se obě čáry potkají, se říká <span class="hl">bod bivalence</span>. Pod ní musí dotápět elektrická patrona nebo kotel. Čerpadlo se navrhuje tak, aby to bylo jen pár nejstudenějších dní v roce.</p>
+        <p>Proto čerpadla řídí teplotu vody podle počasí. Této <em>ekvitermní regulaci</em> stačí v podzimním dni vlažná voda a horkou pouští, až když přituhne. A proto se čerpadlo nejlíp snese s podlahovým topením: velká plocha podlahy vytopí dům i vodou o 30 až 35 °C, kdežto radiátory v mrazu chtějí 50 až 55 °C. Topenáři mluví o <em>teplotním spádu</em>: když voda odchází do podlahy o 35 °C a vrací se o 30 °C, je spád 35/30 °C. U starších radiátorů bývá 55/45 °C i víc. Pro čerpadlo platí, že čím nižší čísla, tím lépe.</p>
+        <p>Ve vlhkém počasí kolem nuly navíc venkovní jednotka namrzá, stejně jako výparník v ledničce. Čerpadlo ji proto čas od času na pár minut obrátí a led roztopí teplem z domu. Proto se z venkovní jednotky v zimě občas vyvalí oblak páry.</p>
+      </div>
+      <aside class="note" aria-label="Poznámka na okraj">
+        <span class="label">Zkuste</span>
+        <p>V obrázku 2 přepněte na tepelné čerpadlo a stáhněte teplotu venku z 10 na −15 °C. Topný faktor spadne z 5,4 na 2,5 a pod −13 °C se v grafu objeví červené pole, kde dotápí patrona.</p>
+        <p>Pak nastavte −10 °C a přepněte z podlahového topení na radiátory. Zdvih vyskočí z 56 na 73 °C a patrona se zapne už teď.</p>
+      </aside>
+    </section>
+
+    <section class="sec" aria-labelledby="h-zdroje">
+      <div class="prose">
+        <h2 id="h-zdroje">Vzduch, země, nebo voda</h2>
+        <p>Tepelná čerpadla se pojmenovávají podle toho, odkud teplo berou a čemu ho dávají. Nejčastější je <b>vzduch–voda</b>: venkovní jednotka s ventilátorem bere teplo z venkovního vzduchu a ohřívá vodu do topení a do bojleru. Je nejlevnější a postaví se za pár dní. Nevýhodou je, že má nejhorší topný faktor právě tehdy, kdy topíte nejvíc.</p>
+        <p>Čerpadlo <b>země–voda</b> bere teplo z vrtu hlubokého zhruba 80 až 150 metrů. Ve vrtu je smyčka z plastové trubky a v ní koluje nemrznoucí směs, takzvaná solanka. Hornina má v hloubce po celý rok kolem 10 °C, a tak se solanka vrací kolem 2 °C, ať je venku léto, nebo mráz. Topný faktor proto v zimě skoro neklesá. Místo vrtu jde použít i plošný kolektor: stovky metrů trubek zahrabaných metr až dva pod zahradou.</p>
+        <p>Čerpadlo <b>voda–voda</b> čerpá podzemní vodu z jedné studny, ochladí ji o pár stupňů a vrací ji do druhé. Podzemní voda má kolem 10 °C celý rok, takže topný faktor je ze všech nejlepší. Potřebujete ale dost vody a povolení k jejímu odběru.</p>
+        <p>Klimatizace, která umí topit, je čerpadlo <b>vzduch–vzduch</b>. Ohřívá přímo vzduch v pokoji, a je proto levná a rychlá. Neohřeje ale vodu na sprchování a každá místnost potřebuje svou vnitřní jednotku.</p>
+      </div>
+      <aside class="note" aria-label="Poznámka na okraj">
+        <span class="label">Zkuste</span>
+        <p>Při −15 °C dá vrt topný faktor 3,6 a vzduch jen 2,5. Při 10 °C je to ale naopak, vzduch má 5,4 a vrt 4,4. V grafu topného faktoru se čáry kříží kolem 4 °C. Přes celou zimu proto vrt vyhraje méně, než by se zdálo podle mrazivých dní.</p>
+      </aside>
+    </section>
+
+    <section class="sec" aria-labelledby="h-fve">
+      <div class="prose">
+        <h2 id="h-fve">Tepelné čerpadlo a fotovoltaika</h2>
+        <p>Čerpadlo je elektrický spotřebič a dá se napájet ze střechy. Háček je v kalendáři. Fotovoltaika vyrábí nejvíc v létě, kdy se netopí, a v zimě, kdy topení potřebujete nejvíc, skoro nic. Elektrárna o výkonu 5 kWp vyrobí v Česku v prosinci kolem 4 kWh za den, v červenci přes 20 kWh. Čerpadlo v našem vzorovém domě přitom při 0 °C spotřebuje za den kolem 27 kWh.</p>
+        <p>V zimě tedy fotovoltaika pokryje jen malou část. Na jaře a na podzim, kdy svítí a ještě se topí, ale zvládne většinu. V létě pak stačí na celý ohřev vody v bojleru.</p>
+        <p>Pomáhá, když čerpadlo umí běžet hlavně ve chvílích, kdy svítí slunce. V poledne nahřeje bojler nebo akumulační nádrž, nebo podlahu o stupeň dva víc, než je potřeba. Večer pak dům z nahromaděného tepla vydrží déle bez topení. Teplo se ukládá levněji než elektřina v baterii.</p>
+      </div>
+      <aside class="note" aria-label="Poznámka na okraj">
+        <span class="label">Zkuste</span>
+        <p>Nastavte −5 °C a fotovoltaiku na 1 kW, což je typické zimní poledne. Pokryje jen část spotřeby. Pak zkuste 10 °C a 4 kW, jarní den. Čerpadlo potřebuje méně než půl kilowattu a zbytek je přebytek.</p>
+      </aside>
+    </section>
+
+    <section class="sec" aria-labelledby="h-klima">
+      <div class="prose">
+        <h2 id="h-klima">Klimatizace: lednička velká jako pokoj</h2>
+        <p>Klimatizace typu split má dvě části spojené trubkami skrz zeď. Ve vnitřní jednotce pod stropem je výparník a ventilátor, který přes něj fouká vzduch z pokoje. Venkovní jednotka má kompresor, kondenzátor a velký ventilátor, který teplo z pokoje vyfukuje na ulici, i když je tam tepleji než uvnitř.</p>
+        <p>Výparník má kolem 10 °C, takže se na něm sráží vlhkost ze vzduchu jako na láhvi vytažené z ledničky. Voda odtéká hadičkou ven, proto z klimatizací kape. Vzduch v pokoji je díky tomu i sušší.</p>
+        <p>Většina klimatizací umí i topit. Mají v okruhu <span class="hl">čtyřcestný ventil</span>, který přehodí, do kterého výměníku pošle kompresor horkou páru. Venkovní jednotka se pak stane výparníkem a vnitřní kondenzátorem. Klimatizace je v tu chvíli tepelné čerpadlo vzduch–vzduch.</p>
+        <p>Mobilní klimatizace má oba výměníky v jedné krabici. Teplo z kondenzátoru proto musí vyvádět hadicí z okna. Bez ní by pokoj ohřívala stejně jako otevřená lednička kuchyň.</p>
+      </div>
+      <aside class="note" aria-label="Poznámka na okraj">
+        <span class="label">Zkuste</span>
+        <p>V obrázku 2 přepněte z klimatizace na tepelné čerpadlo. Okruh zůstane stejný, jen se dům přestěhuje na druhou stranu zdi. Čtyřcestný ventil to udělá obráceně: dům nechá na místě a přehodí strany okruhu.</p>
+      </aside>
     </section>
 
     <section class="sec" aria-labelledby="h-chladivo">
@@ -621,6 +841,526 @@
     }
     render();
     requestAnimationFrame(frame);
+  })();
+
+  /* ---------- obr. 2: jeden okruh, tři stroje ---------- */
+  (() => {
+    const NS = "http://www.w3.org/2000/svg";
+    function el(tag, attrs, parent) {
+      const n = document.createElementNS(NS, tag);
+      for (const k in attrs || {}) n.setAttribute(k, attrs[k]);
+      if (parent) parent.appendChild(n);
+      return n;
+    }
+    const svg = document.getElementById("cmp");
+
+    // tlak sytých par, °C -> bar
+    const R600A = (t) => Math.pow(10, 6.74808 - 882.8 / (240 + t)) * 0.00133322;
+    const R32 = (t) => Math.exp(10.827 - 2385 / (t + 273.15));
+    const R290 = (t) => Math.exp(9.866 - 2270 / (t + 273.15));
+
+    // cold/hot: co je na studené a teplé straně; knob: kterou stranu ovládá posuvník
+    // dTe, dTc: o kolik je chladivo ve výparníku studenější a v kondenzátoru teplejší než okolí
+    const MODES = {
+      fridge: {
+        cold: { cap: "UVNITŘ LEDNIČKY", T: 4, tag: "UŽITEK: CHLAD" },
+        hot: { cap: "KUCHYŇ", tag: "ODPADNÍ TEPLO" },
+        knob: "hot", min: 16, max: 35, t: 22, knobLabel: "Teplota v kuchyni",
+        want: "cold", wall: "izolace", brick: false, valve: "kapilára",
+        evapSub: "zadní stěna uvnitř", condSub: "mřížka na zádech",
+        inName: "teplo z vnitřku", outName: "teplo do kuchyně",
+        dTe: 25, dTc: 16, eta: 0.42, pel: 65, psat: R600A,
+      },
+      ac: {
+        cold: { cap: "POKOJ", T: 24, tag: "UŽITEK: CHLAD" },
+        hot: { cap: "VENKU", tag: "ODPADNÍ TEPLO" },
+        knob: "hot", min: 24, max: 42, t: 32, knobLabel: "Teplota venku",
+        want: "cold", wall: "zeď domu", brick: true, valve: "expanzní ventil",
+        evapSub: "vnitřní jednotka", condSub: "venkovní jednotka",
+        inName: "teplo z pokoje", outName: "teplo ven",
+        dTe: 14, dTc: 14, eta: 0.5, pel: 1000, psat: R32,
+      },
+      hp: { min: -20, max: 15, t: 0, knobLabel: "Teplota venku", wall: "zeď domu", brick: true, valve: "expanzní ventil", psat: R290 },
+    };
+    let mode = "fridge";
+
+    /* ---------- tepelné čerpadlo a dům ---------- */
+    const HOUSE_IN = 21, DESIGN_OUT = -15;
+    const UA = 7000 / (HOUSE_IN - DESIGN_OUT);   // dům ztrácí 7 kW při −15 °C, W/K
+    const P_MAX = 2500;                          // nejvyšší příkon kompresoru, W
+    const Q_MAX = 9000;                          // víc tepla výměníky nepřenesou, W
+    const ETA_HP = 0.5;
+    const SOURCES = {
+      air: { label: "vzduch", cap: "VENKOVNÍ VZDUCH", T: (out) => out, dTe: 8, sub: "venkovní jednotka", inName: "teplo z venkovního vzduchu" },
+      ground: { label: "země", cap: "SOLANKA Z VRTU", T: () => 2, dTe: 6, sub: "výměník se solankou", inName: "teplo z vrtu" },
+      water: { label: "voda", cap: "VODA ZE STUDNY", T: () => 10, dTe: 6, sub: "výměník s vodou", inName: "teplo ze studny" },
+    };
+    // design: teplota topné vody při −15 °C; null = topí přímo vzduchem
+    const SINKS = {
+      floor: { label: "voda", cap: "PODLAHOVÉ TOPENÍ", design: 35, dTc: 5, sub: "výměník do vody", outName: "teplo do podlahy" },
+      rad: { label: "voda", cap: "RADIÁTORY", design: 55, dTc: 5, sub: "výměník do vody", outName: "teplo do radiátorů" },
+      air: { label: "vzduch", cap: "VZDUCH V POKOJI", design: null, dTc: 17, sub: "vnitřní jednotka", outName: "teplo do pokoje" },
+    };
+    const hp = { src: "air", snk: "floor", pv: 0 };
+
+    // ekvitermní regulace: čím tepleji venku, tím chladnější voda do topení
+    function supplyT(snk, out) {
+      const d = SINKS[snk].design;
+      if (d === null) return HOUSE_IN;
+      return Math.max(25, HOUSE_IN + ((d - HOUSE_IN) * (HOUSE_IN - out)) / (HOUSE_IN - DESIGN_OUT));
+    }
+    function hpAt(out, src, snk) {
+      const Tsrc = SOURCES[src].T(out), Tsink = supplyT(snk, out);
+      const Te = Tsrc - SOURCES[src].dTe, Tc = Tsink + SINKS[snk].dTc;
+      const cop = (ETA_HP * (Tc + 273.15)) / (Tc - Te);
+      const need = Math.max(0, UA * (HOUSE_IN - out));
+      const max = Math.min(Q_MAX, cop * P_MAX);
+      const qh = Math.min(need, max);
+      return { Tsrc, Tsink, Te, Tc, cop, need, max, qh, pel: qh / cop, backup: need - qh };
+    }
+
+    function derive() {
+      const m = MODES[mode];
+      if (mode === "hp") {
+        const r = hpAt(m.t, hp.src, hp.snk);
+        // výkony zaokrouhlené na desetiny kW, aby na sebe čísla ve výpisu sedla
+        const qh = Math.round(r.qh / 100) * 100, pel = Math.round(r.pel / 100) * 100;
+        return { ...r, Tcold: r.Tsrc, Thot: r.Tsink, pLow: m.psat(r.Te), pHigh: m.psat(r.Tc), qh, pel, qc: qh - pel };
+      }
+      const Tcold = m.knob === "cold" ? m.t : m.cold.T;
+      const Thot = m.knob === "hot" ? m.t : m.hot.T;
+      const Te = Tcold - m.dTe, Tc = Thot + m.dTc;
+      const unit = m.pel < 1000 ? 1 : 100;
+      const qc = Math.round(((m.eta * (Te + 273.15)) / (Tc - Te)) * m.pel / unit) * unit;
+      return { Tcold, Thot, Te, Tc, pLow: m.psat(Te), pHigh: m.psat(Tc), qc, qh: qc + m.pel, pel: m.pel };
+    }
+
+    /* ---------- prostředí ---------- */
+    const zoneCold = el("rect", { x: 0, y: 0, width: 440, height: 450, class: "zone" }, svg);
+    const zoneHot = el("rect", { x: 500, y: 0, width: 440, height: 450, class: "zone" }, svg);
+    el("line", { x1: 0, y1: 450.5, x2: 940, y2: 450.5, class: "floor" }, svg);
+    const wall = el("rect", { x: 440, y: 28, width: 60, height: 422, class: "f-insul2" }, svg);
+    el("rect", { x: 440, y: 28, width: 60, height: 422, class: "outline" }, svg);
+
+    const pics = {};
+    const pic = (key) => { const g = el("g", { class: "pic" }, svg); (pics[key] ||= []).push(g); return g; };
+
+    // lednička: police s jídlem a šuplík
+    let g = pic("fridge");
+    el("rect", { x: 40, y: 332, width: 30, height: 40, rx: 5, class: "solid" }, g);
+    el("rect", { x: 37, y: 325, width: 36, height: 8, rx: 2, class: "solid" }, g);
+    el("path", { d: "M90 372 V318 Q90 308 96 304 V292 H104 V304 Q110 308 110 318 V372 Z", class: "solid" }, g);
+    el("path", { d: "M128 372 V324 L144 310 L160 324 V372 Z", class: "solid" }, g);
+    el("line", { x1: 26, y1: 373, x2: 176, y2: 373 }, g);
+    el("rect", { x: 30, y: 390, width: 142, height: 48, rx: 5 }, g);
+
+    // klimatizace: křeslo v pokoji, slunce venku
+    g = pic("ac");
+    el("path", { d: "M44 432 V378 A12 12 0 0 1 68 378 V400 H132 V378 A12 12 0 0 1 156 378 V432 Z M68 400 V352 A16 16 0 0 1 84 336 H116 A16 16 0 0 1 132 352 V400 M54 432 V444 M146 432 V444", class: "solid" }, g);
+    g = pic("ac");
+    el("circle", { cx: 858, cy: 196, r: 20, class: "sun" }, g);
+    for (let k = 0; k < 8; k++) {
+      const a = (k * Math.PI) / 4, c = Math.cos(a), sn = Math.sin(a);
+      el("line", { x1: 858 + 29 * c, y1: 196 + 29 * sn, x2: 858 + 39 * c, y2: 196 + 39 * sn, class: "sun" }, g);
+    }
+
+    // zdroje tepla: vítr, mráz, vrt, studna
+    g = pic("hp-air");
+    [312, 334, 356].forEach((y, i) => {
+      let p = `M${30 + i * 10} ${y}`;
+      for (let x = 34 + i * 10; x <= 150 + i * 10; x += 4) p += ` L${x} ${(y + 3.5 * Math.sin((x / 22) * Math.PI)).toFixed(1)}`;
+      el("path", { d: p }, g);
+    });
+    g = pic("frost");
+    for (let k = 0; k < 6; k++) {
+      const a = (k * Math.PI) / 3, c = Math.cos(a), sn = Math.sin(a);
+      const x = 100, y = 404;
+      el("line", { x1: x, y1: y, x2: x + 32 * c, y2: y + 32 * sn, class: "snow" }, g);
+      [-0.7, 0.7].forEach((b) => {
+        const bc = Math.cos(a + b), bs = Math.sin(a + b);
+        el("line", { x1: x + 19 * c, y1: y + 19 * sn, x2: x + 19 * c + 9 * bc, y2: y + 19 * sn + 9 * bs, class: "snow" }, g);
+      });
+    }
+    ["hp-ground", "hp-water"].forEach((key) => {
+      g = pic(key);
+      el("rect", { x: 0, y: 330, width: 200, height: 120, class: "soil" }, g);
+      el("line", { x1: 0, y1: 330, x2: 200, y2: 330 }, g);
+    });
+    g = pic("hp-ground");
+    el("path", { d: "M92 330 V436 Q100 446 108 436 V330 M92 330 V318 H120 M108 330 V312 H120", class: "loop" }, g);
+    g = pic("hp-water");
+    el("rect", { x: 0, y: 392, width: 200, height: 58, class: "aquifer" }, g);
+    [56, 138].forEach((x, i) => {
+      el("rect", { x: x - 7, y: 330, width: 14, height: 112, class: "shaft" }, g);
+      const y1 = i ? 352 : 420, y2 = i ? 420 : 352, dir = Math.sign(y2 - y1);
+      el("path", { d: `M${x} ${y1} V${y2 - dir * 8} M${x - 5} ${y2 - dir * 9} L${x} ${y2} L${x + 5} ${y2 - dir * 9}`, class: "loop" }, g);
+    });
+
+    // topení: podlaha, radiátor, vnitřní jednotka
+    g = pic("hp-floor");
+    el("rect", { x: 762, y: 300, width: 156, height: 30, class: "solid" }, g);
+    let loops = "M770 315";
+    for (let x = 770; x < 906; x += 16) loops += ` Q${x + 4} 305 ${x + 8} 315 Q${x + 12} 325 ${x + 16} 315`;
+    el("path", { d: loops, class: "loop warm" }, g);
+    [800, 840, 880].forEach((x) => el("path", { d: `M${x} 292 q4 -8 0 -16 q-4 -8 0 -16`, class: "loop warm" }, g));
+    g = pic("hp-rad");
+    el("line", { x1: 776, y1: 262, x2: 912, y2: 262 }, g);
+    el("line", { x1: 776, y1: 330, x2: 912, y2: 330 }, g);
+    for (let k = 0; k < 6; k++) el("rect", { x: 786 + k * 20, y: 248, width: 14, height: 96, rx: 7, class: "solid" }, g);
+    g = pic("hp-airin");
+    el("rect", { x: 772, y: 236, width: 140, height: 40, rx: 8, class: "solid" }, g);
+    el("line", { x1: 786, y1: 266, x2: 898, y2: 266 }, g);
+    [800, 840, 880].forEach((x) => el("path", { d: `M${x} 284 q-6 16 -2 30 q4 14 -4 28`, class: "loop warm", "stroke-dasharray": "5 5" }, g));
+
+    // fotovoltaika
+    g = pic("pv");
+    el("path", { d: "M846 428 L866 396 H926 L906 428 Z", class: "panel" }, g);
+    el("path", { d: "M856 412 H916 M886 396 L876 428 M906 396 L896 428 M866 396 L856 428", class: "panel-ln" }, g);
+
+    /* ---------- okruh ---------- */
+    const rows = (n, y0, dy, xa, xb) => {
+      const out = [];
+      for (let k = 0; k < n; k++) {
+        const y = y0 + k * dy;
+        out.push(k % 2 ? [[xb, y], [xa, y]] : [[xa, y], [xb, y]]);
+      }
+      return out;
+    };
+    const evap = rows(8, 130, 26, 360, 240);    // výparník: shora dolů, začíná u zdi
+    const cond = rows(7, 130, 30, 680, 560);    // kondenzátor: shora dolů, končí u zdi
+    const flat = (list) => list.flat();
+    const last = (pts) => pts[pts.length - 1];
+    const d = (pts) => "M" + pts.map((p) => p.join(" ")).join(" L");
+
+    const hotGas = [[680, 428], [700, 428], [700, 100], [680, 100], ...flat(cond.slice(0, 2))];
+    const hotMix = [last(hotGas), ...flat(cond.slice(2, 5))];
+    const hotLiq = [last(hotMix), ...flat(cond.slice(5)), [535, 310], [535, 70], [422, 70]];
+    const coldLiq = [[398, 70], [360, 70], ...flat(evap.slice(0, 2))];
+    const coldMix = [last(coldLiq), ...flat(evap.slice(2, 6))];
+    const coldGas = [last(coldMix), ...flat(evap.slice(6)), [392, 312], [392, 428], [610, 428]];
+
+    [[...hotGas, ...hotMix, ...hotLiq], [...coldLiq, ...coldMix, ...coldGas]].forEach((pts) => {
+      el("path", { d: d(pts), class: "tube-out" }, svg);
+      el("path", { d: d(pts), class: "tube-in" }, svg);
+    });
+
+    const GAS = { dash: "0.1 12.9", period: 13, v: 62 };
+    const MIX = { dash: "7 9", period: 16, v: 40 };
+    const LIQ = { dash: "14 6", period: 20, v: 26 };
+    const flows = [
+      [hotGas, "c-hot", GAS], [hotMix, "c-warm", MIX], [hotLiq, "c-warm", LIQ],
+      [coldLiq, "c-cold", LIQ], [coldMix, "c-cold", MIX], [coldGas, "c-cool", GAS],
+    ].map(([pts, cls, kind]) => {
+      el("path", { d: d(pts), class: `glow ${cls}` }, svg);
+      return { node: el("path", { d: d(pts), class: `flow ${cls}`, "stroke-dasharray": kind.dash }, svg), kind, off: 0 };
+    });
+    el("path", { d: "M398 60 L422 80 V60 L398 80 Z", class: "valve" }, svg);
+
+    el("rect", { x: 620, y: 446, width: 14, height: 4, class: "comp-foot" }, svg);
+    el("rect", { x: 656, y: 446, width: 14, height: 4, class: "comp-foot" }, svg);
+    el("path", { d: "M610 446 V424 A35 24 0 0 1 680 424 V446 Z", class: "comp" }, svg);
+
+    /* ---------- teplo ---------- */
+    function arrow(x1, y, x2, cls, parent) {
+      const a = el("g", { class: `arrow ${cls}` }, parent);
+      el("line", { x1, y1: y, x2: x2 - 8, y2: y }, a);
+      el("path", { d: `M${x2} ${y} L${x2 - 13} ${y - 7} L${x2 - 13} ${y + 7} Z` }, a);
+    }
+    const heatIn = el("g", {}, svg);
+    [200, 245, 290].forEach((y) => arrow(165, y, 228, "warm", heatIn));
+    const heatOut = el("g", {}, svg);
+    const waves = [590, 620, 650].map((x) => {
+      let p = `M${x} 118`;
+      for (let y = 114; y >= 60; y -= 3) p += ` L${(x + 4.5 * Math.sin(((118 - y) / 58) * Math.PI * 3)).toFixed(1)} ${y}`;
+      el("path", { d: `M${x - 6} 63 L${x} 52 L${x + 6} 63`, class: "wave" }, heatOut);
+      return el("path", { d: p, class: "wave", "stroke-dasharray": "7 6" }, heatOut);
+    });
+
+    /* ---------- popisky ---------- */
+    const text = (attrs, parent) => el("text", attrs, parent || svg);
+    const call = () => el("g", { class: "callout" }, svg);
+
+    const coldCap = text({ x: 24, y: 50, class: "r-cap" });
+    const coldVal = text({ x: 24, y: 92, class: "r-val" });
+    const coldTag = text({ x: 24, y: 118, class: "want" });
+    const coldNote = text({ x: 24, y: 140, class: "want muted" });
+    const hotCap = text({ x: 916, y: 50, class: "r-cap", "text-anchor": "end" });
+    const hotVal = text({ x: 916, y: 92, class: "r-val", "text-anchor": "end" });
+    const hotTag = text({ x: 916, y: 118, class: "want", "text-anchor": "end" });
+    const hotNote = text({ x: 916, y: 140, class: "want warn", "text-anchor": "end" });
+
+    const wallTxt = text({ x: 470, y: 18, "text-anchor": "middle" }, call());
+    const valveTxt = text({ x: 432, y: 50, "text-anchor": "end" }, call());
+
+    text({ x: 300, y: 338, class: "coil-name" }).textContent = "výparník";
+    let c = call();
+    const evapSub = text({ x: 300, y: 356, class: "coil-sub" }, c);
+    const evapT = text({ x: 300, y: 373, class: "coil-sub" }, c);
+    const evapP = text({ x: 300, y: 390, class: "coil-sub" }, c);
+    text({ x: 620, y: 338, class: "coil-name" }).textContent = "kondenzátor";
+    c = call();
+    const condSub = text({ x: 620, y: 356, class: "coil-sub" }, c);
+    const condT = text({ x: 620, y: 373, class: "coil-sub" }, c);
+    const condP = text({ x: 620, y: 390, class: "coil-sub" }, c);
+
+    c = call();
+    text({ x: 190, y: 160, "text-anchor": "middle" }, c).textContent = "bere teplo";
+    const inVal = text({ x: 190, y: 181, "text-anchor": "middle", class: "big" }, c);
+    c = call();
+    text({ x: 668, y: 30, "text-anchor": "start" }, c).textContent = "odevzdává teplo";
+    const outVal = text({ x: 668, y: 52, "text-anchor": "start", class: "big" }, c);
+    c = call();
+    text({ x: 716, y: 420 }, c).textContent = "elektřina";
+    const elVal = text({ x: 716, y: 440 }, c);
+    const pvTxt = text({ x: 886, y: 446, "text-anchor": "middle" }, call());
+
+    /* ---------- výpis ---------- */
+    const fmt0 = new Intl.NumberFormat("cs-CZ", { maximumFractionDigits: 0 });
+    const fmt1 = new Intl.NumberFormat("cs-CZ", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const minus = (str) => str.replace("-", "−");
+    const deg = (v) => `${minus(fmt0.format(Math.round(v) || 0))} °C`;
+    const watts = (v) => (v < 1000 ? `${fmt0.format(v)} W` : `${fmt1.format(v / 1000)} kW`);
+    const kw = (v) => `${fmt1.format(Math.round(v / 100) / 10)} kW`;
+
+    const cache = new WeakMap();
+    function put(node, str, html) {
+      if (cache.get(node) === str) return;
+      cache.set(node, str);
+      if (html) node.innerHTML = str; else node.textContent = str;
+    }
+
+    // podbarvení podle teploty: pod 20 °C do modra, nad 20 °C do červena
+    function tint(rect, T) {
+      const cold = T < 20;
+      const k = cold ? Math.min(1, (20 - T) / 30) : Math.min(1, (T - 20) / 20);
+      rect.style.fill = cold ? "var(--cold)" : "var(--hot)";
+      rect.style.opacity = (0.02 + k * (cold ? 0.13 : 0.1)).toFixed(3);
+    }
+
+    const STATUS = {
+      fridge: "<strong>Lednička</strong> bere teplo z vnitřku a odevzdává ho do kuchyně. Užitečná je studená strana, teplo na zádech je odpad.",
+      ac: "<strong>Klimatizace</strong> bere teplo z pokoje a vyhání ho ven, i když je venku tepleji než uvnitř. Užitečná je studená strana, stejně jako u ledničky.",
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const statusEl = $("cmp-status"), copEl = $("cmp-cop"), liftEl = $("cmp-lift"), pvEl = $("cmp-pv");
+    const cells = [...document.querySelectorAll("#cmp-stats li")];
+    const tIn = $("cmp-t"), tVal = $("cmp-t-val"), tLbl = $("cmp-t-lbl");
+    const pvIn = $("cmp-pv-in"), pvVal = $("cmp-pv-val");
+    const hpOnly = [$("hp-controls"), $("hp-charts"), liftEl, pvEl];
+
+    function render() {
+      const m = MODES[mode], r = derive(), isHp = mode === "hp";
+      const src = SOURCES[hp.src], snk = SINKS[hp.snk];
+      const power = isHp ? kw : watts;
+
+      put(coldCap, isHp ? src.cap : m.cold.cap); put(coldVal, deg(r.Tcold));
+      put(coldTag, isHp ? "ZDROJ TEPLA" : m.cold.tag);
+      put(coldNote, isHp && hp.src !== "air" ? `venku ${deg(m.t)}` : "");
+      put(hotCap, isHp ? snk.cap : m.hot.cap); put(hotVal, deg(r.Thot));
+      put(hotTag, isHp ? "UŽITEK: TEPLO" : m.hot.tag);
+      put(hotNote, isHp && r.backup > 50 ? `+ patrona ${kw(r.backup)}` : "");
+      const wantHot = isHp || m.want === "hot";
+      coldTag.classList.toggle("muted", wantHot);
+      hotTag.classList.toggle("muted", !wantHot);
+      tint(zoneCold, r.Tcold);
+      tint(zoneHot, r.Thot);
+      wall.setAttribute("class", m.brick ? "f-brick" : "f-insul2");
+      put(wallTxt, m.wall);
+      put(valveTxt, m.valve);
+
+      const shown = isHp ? ["hp-" + hp.src, { floor: "hp-floor", rad: "hp-rad", air: "hp-airin" }[hp.snk]] : [mode];
+      if (isHp && hp.src === "air" && m.t <= 0) shown.push("frost");
+      if (isHp && hp.pv > 0) shown.push("pv");
+      for (const k in pics) pics[k].forEach((p) => p.classList.toggle("on", shown.includes(k)));
+
+      put(evapSub, isHp ? src.sub : m.evapSub); put(evapT, `vře při ${deg(r.Te)}`); put(evapP, `${fmt1.format(r.pLow)} bar`);
+      put(condSub, isHp ? snk.sub : m.condSub); put(condT, `kapalní při ${deg(r.Tc)}`); put(condP, `${fmt1.format(r.pHigh)} bar`);
+      put(inVal, power(r.qc)); put(outVal, power(r.qh)); put(elVal, power(r.pel));
+      put(pvTxt, isHp && hp.pv > 0 ? `FVE ${kw(hp.pv)}` : "");
+
+      put(cells[0].children[0], isHp ? src.inName : m.inName); put(cells[0].children[1], power(r.qc));
+      put(cells[1].children[1], power(r.pel));
+      put(cells[2].children[0], isHp ? snk.outName : m.outName); put(cells[2].children[1], power(r.qh));
+      cells[0].classList.toggle("dim", wantHot);
+      cells[2].classList.toggle("dim", !wantHot);
+      hpOnly.forEach((n) => { n.hidden = !isHp; });
+
+      if (!isHp) {
+        put(statusEl, STATUS[mode], true);
+        const ratio = fmt1.format(r.qc / r.pel);
+        put(copEl, mode === "fridge"
+          ? `Z každé kilowatthodiny elektřiny odvede z vnitřku <b>${ratio} kWh</b> tepla.`
+          : `Z každé kilowatthodiny elektřiny odvede z pokoje <b>${ratio} kWh</b> tepla. Tomuhle poměru se říká chladicí faktor.`, true);
+        return;
+      }
+
+      const name = `${src.label}–${snk.label}`;
+      const out = deg(m.t);
+      put(statusEl, r.backup > 50
+        ? `<strong>Tepelné čerpadlo ${name}.</strong> Při ${out} venku dům ztrácí ${kw(r.need)}. Čerpadlo dá nejvýš ${kw(r.max)}, zbytek dotápí elektrická patrona, která z kilowatthodiny udělá jen kilowatthodinu tepla.`
+        : `<strong>Tepelné čerpadlo ${name}.</strong> Při ${out} venku dům ztrácí ${kw(r.need)} a čerpadlo je pokryje samo. Kompresor jede na ${fmt0.format(Math.round((r.pel / P_MAX) * 100))} % svého výkonu.`, true);
+
+      const elTotal = r.pel + r.backup;
+      let copTxt = `Z každé kilowatthodiny elektřiny dodá do domu <b>${fmt1.format(r.cop)} kWh</b> tepla. Tomuhle poměru se říká topný faktor.`;
+      if (r.backup > 50) copTxt += ` I s patronou je to v průměru ${fmt1.format(r.need / elTotal)} kWh.`;
+      put(copEl, copTxt, true);
+      put(liftEl, `Teplotní zdvih: chladivo vře při ${deg(r.Te)} a kapalní při ${deg(r.Tc)}. Kompresor musí teplo „vytáhnout“ o <b>${fmt0.format(Math.round(r.Tc - r.Te))} °C</b>.`, true);
+
+      const fromPv = Math.min(hp.pv, elTotal), surplus = hp.pv - fromPv;
+      put(pvEl, hp.pv === 0
+        ? `Fotovoltaika teď nedává nic, všech ${kw(elTotal)} jde ze sítě.`
+        : surplus > 50
+          ? `Fotovoltaika pokryje celou spotřebu (${kw(elTotal)}) a ${kw(surplus)} zbývá. Chytrá regulace ho může uložit jako teplo: nahřát bojler nebo podlahu o stupeň víc, než je potřeba.`
+          : `Fotovoltaika pokryje ${kw(fromPv)} z ${kw(elTotal)}, zbylých ${kw(elTotal - fromPv)} jde ze sítě.`, true);
+
+      drawCharts();
+    }
+
+    /* ---------- grafy podle teploty venku ---------- */
+    const CH = { x0: 44, x1: 360, y0: 12, y1: 206, t0: -20, t1: 15 };
+    const sx = (t) => CH.x0 + ((t - CH.t0) / (CH.t1 - CH.t0)) * (CH.x1 - CH.x0);
+    const temps = [];
+    for (let t = CH.t0; t <= CH.t1; t += 0.5) temps.push(t);
+
+    function chart(svgEl, vmax, step, unit, scale) {
+      const sy = (v) => CH.y1 - (Math.min(v, vmax) / vmax) * (CH.y1 - CH.y0);
+      const axes = el("g", {}, svgEl);
+      for (let v = 0; v <= vmax; v += step) {
+        el("line", { x1: CH.x0, x2: CH.x1, y1: sy(v), y2: sy(v), class: v ? "ch-grid" : "ch-base" }, axes);
+        el("text", { x: CH.x0 - 6, y: sy(v) + 4, class: "ch-tick", "text-anchor": "end" }, axes).textContent = v ? fmt0.format(v / scale) : `0 ${unit}`;
+      }
+      for (let t = -20; t <= 10; t += 10) {
+        el("text", { x: sx(t), y: CH.y1 + 18, class: "ch-tick", "text-anchor": "middle" }, axes).textContent = `${minus(String(t))} °C`;
+      }
+      const layer = el("g", {}, svgEl);
+      const marker = el("g", {}, svgEl);
+      const mLine = el("line", { y1: CH.y0, y2: CH.y1, class: "ch-marker" }, marker);
+      const hit = el("rect", { x: CH.x0, y: CH.y0, width: CH.x1 - CH.x0, height: CH.y1 - CH.y0 + 20, class: "ch-hit" }, svgEl);
+      // tažením po grafu se mění teplota venku
+      const scrub = (e) => {
+        const pt = svgEl.createSVGPoint();
+        pt.x = e.clientX; pt.y = e.clientY;
+        const p = pt.matrixTransform(svgEl.getScreenCTM().inverse());
+        const t = Math.round(CH.t0 + ((p.x - CH.x0) / (CH.x1 - CH.x0)) * (CH.t1 - CH.t0));
+        setOut(Math.max(CH.t0, Math.min(CH.t1, t)));
+      };
+      hit.addEventListener("pointerdown", (e) => { hit.setPointerCapture(e.pointerId); scrub(e); });
+      hit.addEventListener("pointermove", (e) => { if (hit.hasPointerCapture(e.pointerId)) scrub(e); });
+      return { sy, layer, marker, mLine };
+    }
+    const line = (pts) => "M" + pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(" L");
+    // popisky na konci čar posunuté od sebe, aby se nepřekrývaly
+    function endLabels(layer, items) {
+      items.sort((a, b) => a.y - b.y);
+      for (let i = 1; i < items.length; i++) items[i].y = Math.max(items[i].y, items[i - 1].y + 14);
+      items.forEach((it) => { el("text", { x: CH.x1 + 8, y: it.y + 4, class: `ch-lbl ${it.cls || ""}` }, layer).textContent = it.text; });
+    }
+
+    const chP = chart($("ch-power"), 10000, 2000, "kW", 1000);
+    const chC = chart($("ch-cop"), 7, 1, "", 1);
+    const dots = [chP, chP, chC].map((ch) => el("circle", { r: 4.5, class: "ch-dot" }, ch.marker));
+    const dotVals = [chP, chP, chC].map((ch) => el("text", { class: "ch-val" }, ch.marker));
+    let drawnFor = "";
+
+    function drawCharts() {
+      const key = hp.src + hp.snk;
+      if (key !== drawnFor) {
+        drawnFor = key;
+        // výkon: potřeba domu proti tomu, co čerpadlo zvládne
+        chP.layer.replaceChildren();
+        const rs = temps.map((t) => hpAt(t, hp.src, hp.snk));
+        const need = rs.map((r, i) => [sx(temps[i]), chP.sy(r.need)]);
+        const max = rs.map((r, i) => [sx(temps[i]), chP.sy(r.max)]);
+        const lack = rs.map((r, i) => r.need > r.max);
+        if (lack.some(Boolean)) {
+          const idx = lack.map((v, i) => (v ? i : -1)).filter((i) => i >= 0);
+          const top = idx.map((i) => need[i]), bot = idx.map((i) => max[i]).reverse();
+          el("path", { d: line([...top, ...bot]) + " Z", class: "ch-gap" }, chP.layer);
+          el("text", { x: need[idx[0]][0] + 6, y: (need[idx[0]][1] + max[idx[0]][1]) / 2 + 4, class: "ch-lbl" }, chP.layer).textContent = "patrona";
+        }
+        el("path", { d: line(need), class: "ch-need" }, chP.layer);
+        el("path", { d: line(max), class: "ch-max" }, chP.layer);
+        endLabels(chP.layer, [
+          { y: need[need.length - 1][1], text: "potřeba domu" },
+          { y: max[max.length - 1][1], text: "čerpadlo", cls: "strong" },
+        ]);
+
+        // topný faktor pro všechny tři zdroje, zvolený zvýrazněný
+        chC.layer.replaceChildren();
+        const labels = [];
+        Object.keys(SOURCES).forEach((s) => {
+          const pts = temps.map((t) => [sx(t), chC.sy(hpAt(t, s, hp.snk).cop)]);
+          const on = s === hp.src;
+          el("path", { d: line(pts), class: on ? "ch-max" : "ch-other" }, chC.layer);
+          labels.push({ y: pts[pts.length - 1][1], text: { air: "vzduch", ground: "vrt", water: "studna" }[s], cls: on ? "strong" : "" });
+        });
+        endLabels(chC.layer, labels);
+      }
+
+      const t = MODES.hp.t, r = hpAt(t, hp.src, hp.snk), x = sx(t);
+      [chP, chC].forEach((ch) => { ch.mLine.setAttribute("x1", x); ch.mLine.setAttribute("x2", x); });
+      [[chP.sy(r.need), kw(r.need)], [chP.sy(r.max), kw(r.max)], [chC.sy(r.cop), fmt1.format(r.cop)]].forEach(([y, v], i) => {
+        dots[i].setAttribute("cx", x); dots[i].setAttribute("cy", y);
+        const left = x > CH.x1 - 60;
+        dotVals[i].setAttribute("x", left ? x - 9 : x + 9);
+        dotVals[i].setAttribute("y", y - 8);
+        dotVals[i].setAttribute("text-anchor", left ? "end" : "start");
+        dotVals[i].textContent = v;
+      });
+      // hodnoty potřeby a výkonu se při velké blízkosti rozestoupí
+      const a = Number(dots[0].getAttribute("cy")), b = Number(dots[1].getAttribute("cy"));
+      if (Math.abs(a - b) < 16) {
+        dotVals[a < b ? 0 : 1].setAttribute("y", Math.min(a, b) - 8);
+        dotVals[a < b ? 1 : 0].setAttribute("y", Math.max(a, b) + 18);
+      }
+    }
+
+    /* ---------- ovládání ---------- */
+    function syncKnob() {
+      const m = MODES[mode];
+      tIn.min = m.min; tIn.max = m.max; tIn.value = m.t;
+      tLbl.textContent = m.knobLabel;
+      tVal.textContent = deg(m.t);
+    }
+    function setOut(t) {
+      MODES[mode].t = t;
+      tIn.value = t;
+      tVal.textContent = deg(t);
+      render();
+    }
+    function bindSeg(id, apply) {
+      const seg = $(id);
+      seg.addEventListener("click", (e) => {
+        const b = e.target.closest("button[data-v]");
+        if (!b) return;
+        seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+        apply(b.dataset.v);
+        render();
+      });
+    }
+    bindSeg("mode-seg", (v) => { mode = v; syncKnob(); });
+    bindSeg("src-seg", (v) => { hp.src = v; });
+    bindSeg("snk-seg", (v) => { hp.snk = v; });
+    tIn.addEventListener("input", () => setOut(Number(tIn.value)));
+    pvIn.addEventListener("input", () => { hp.pv = Number(pvIn.value) * 1000; pvVal.textContent = kw(hp.pv); render(); });
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let prev = performance.now(), waveOff = 0;
+    function frame(now) {
+      const dt = Math.min(0.1, (now - prev) / 1000);
+      prev = now;
+      flows.forEach((f) => {
+        f.off = (f.off - f.kind.v * dt) % f.kind.period;
+        f.node.setAttribute("stroke-dashoffset", f.off.toFixed(2));
+      });
+      waveOff = (waveOff - 22 * dt) % 13;
+      waves.forEach((w) => w.setAttribute("stroke-dashoffset", waveOff.toFixed(2)));
+      requestAnimationFrame(frame);
+    }
+    syncKnob();
+    render();
+    if (!reduced) requestAnimationFrame(frame);
   })();
   </script>
   <script src="/app.js" defer></script>
